@@ -3,6 +3,12 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/find-a-home', function () { return view('find-home'); })->name('home.find');
+Route::get('/list-property', function () { return view('list-property'); })->name('property.list');
+Route::get('/services', function () { return view('services'); })->name('services');
+Route::get('/about', function () { return view('about'); })->name('about');
+Route::get('/contact', function () { return view('contact'); })->name('contact');
+
 Route::get('/', function () {
     return view('welcome');
 });
