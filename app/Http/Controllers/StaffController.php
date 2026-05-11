@@ -7,26 +7,52 @@ use App\Models\Staff;
 use App\Models\NextOfKin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class StaffController extends Controller
 {
     public function create()
     {
         return view('staff_details.create_staff');
+
+        if(
+            auth()->user()->user_type != 'admin' &&
+            auth()->user()->user_type != 'manager'
+        ){
+            abort(403);
+        }
+
+        return view('staff_details.create_staff');
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
+            'name' => 'required|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6',
+            'password' => 'required|min:8',
 
             'staff_id' => 'required|unique:staff,staff_id',
             'first_name' => 'required',
             'last_name' => 'required',
+
+            'phone' => 'nullable|max:20',
+
+            'salary' => 'nullable|numeric|min:0',
+
             'position' => 'required',
+
+            'user_type' => 'required'
         ]);
+
+        if(
+            auth()->user()->user_type != 'admin' &&
+            auth()->user()->user_type != 'manager'
+        ){
+            abort(403);
+        }
+
+        return view('staff_details.create_staff');
 
         /*
         Only admin can create manager
@@ -37,6 +63,16 @@ class StaffController extends Controller
             && auth()->user()->user_type != 'admin'
         ) {
             return back()->with('error', 'Only admin can assign Manager.');
+        }
+
+        if(
+            $request->user_type == 'manager' &&
+            auth()->user()->user_type != 'admin'
+        ){
+            return back()->with(
+                'error',
+                'Only admins can create managers.'
+            );
         }
 
         /*
