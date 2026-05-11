@@ -1,0 +1,1 @@
+A repository about the DreamHome case study, in which we create a website and a database to display the DreamHome website
