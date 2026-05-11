@@ -18,6 +18,7 @@ Route::get('/', function () {
 });
 
 // FIXED: Changed name from 'find-home' to 'home.find' to match your Nav Bar
+Route::post('/property/store', [PropertyController::class, 'store'])->name('property.store');
 Route::get('/find-a-home', [PropertyController::class, 'index'])->name('home.find');
 Route::get('/list-property', function () { return view('list-property'); })->name('property.list');
 Route::get('/services', function () { return view('services'); })->name('services');
@@ -49,6 +50,16 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/staff/{id}/next-of-kin', [StaffController::class, 'storeNextOfKin'])
         ->name('staff.nextofkin.store');
+    
+
+    Route::get('/debug-db', function () {
+    try {
+        $properties = DB::table('property')->get();
+        return response()->json($properties);
+    } catch (\Exception $e) {
+        return "Error connecting to database: " . $e->getMessage();
+    }
+});
 });
 
 require __DIR__.'/auth.php';
