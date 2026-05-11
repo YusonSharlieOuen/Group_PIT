@@ -2,99 +2,68 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Models\Branch;
 use App\Models\Staff;
 use App\Models\NextOfKin;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class StaffController extends Controller
 {
+    public function index()
+    {
+        $staffs = Staff::with(['branch', 'supervisor', 'nextOfKin'])
+            ->orderBy('staff_id')
+            ->paginate(5)
+            ->withQueryString();
+
+        return view('staff_details.index', compact('staffs'));
+    }
+
     public function create()
     {
-        return view('staff_details.create_staff');
+        $branches = Branch::orderBy('branch_id')->get();
+        $supervisors = Staff::orderBy('first_name')->orderBy('last_name')->get();
+
+        return view('staff_details.create_staff', compact('branches', 'supervisors'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6',
-
-            'staff_id' => 'required|unique:staff,staff_id',
-            'first_name' => 'required',
-            'last_name' => 'required',
-            'position' => 'required',
+        $validated = $request->validate([
+            'staff_id' => ['required', 'string', 'max:10', 'unique:staff,staff_id'],
+            'first_name' => ['required', 'string', 'max:50'],
+            'last_name' => ['required', 'string', 'max:50'],
+            'address' => ['nullable', 'string'],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'sex' => ['nullable', 'string', 'max:10'],
+            'date_of_birth' => ['nullable', 'date'],
+            'nin' => ['nullable', 'string', 'max:20'],
+            'position' => ['required', 'string', 'max:20'],
+            'salary' => ['nullable', 'numeric', 'min:0'],
+            'date_joined' => ['nullable', 'date'],
+            'branch_id' => ['nullable', 'exists:branch,branch_id'],
+            'supervisor_id' => ['nullable', 'exists:staff,staff_id', 'different:staff_id'],
         ]);
 
-        /*
-        Only admin can create manager
-        */
-
-        if (
-            $request->position == 'Manager'
-            && auth()->user()->user_type != 'admin'
-        ) {
-            return back()->with('error', 'Only admin can assign Manager.');
-        }
-
-        /*
-        Create user
-        */
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'user_type' => strtolower($request->position)
-        ]);
-
-        /*
-        Create staff
-        */
-
-        Staff::create([
-            'staff_id' => $request->staff_id,
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'address' => $request->address,
-            'phone' => $request->phone,
-            'sex' => $request->sex,
-            'date_of_birth' => $request->date_of_birth,
-            'nin' => $request->nin,
-            'position' => $request->position,
-            'salary' => $request->salary,
-            'date_joined' => $request->date_joined,
-            'branch_id' => $request->branch_id,
-            'supervisor_id' => $request->supervisor_id,
-            'user_id' => $user->id
-        ]);
+        Staff::create($validated);
 
         return redirect()
-            ->route('staff.show', $request->staff_id)
+            ->route('staff.show', $validated['staff_id'])
             ->with('success', 'Staff created successfully.');
     }
 
     public function show($id)
     {
-        $staff = Staff::with('nextOfKin', 'user')
+        $staff = Staff::with(['branch', 'supervisor', 'subordinates', 'nextOfKin'])
             ->findOrFail($id);
 
         return view('staff_details.staff_details', compact('staff'));
     }
 
-    /*
-    NEXT OF KIN
-    */
-
     public function createNextOfKin($id)
     {
         $staff = Staff::findOrFail($id);
-
-        /*
-        Prevent duplicate next of kin
-        */
 
         if ($staff->nextOfKin) {
             return back()->with('error', 'Next of kin already exists.');
@@ -127,5 +96,62 @@ class StaffController extends Controller
         return redirect()
             ->route('staff.show', $id)
             ->with('success', 'Next of kin added.');
+    }
+
+    public function edit($id)
+    {
+        $staff = Staff::findOrFail($id);
+        $branches = Branch::orderBy('branch_id')->get();
+        $supervisors = Staff::where('staff_id', '!=', $id)
+            ->orderBy('first_name')
+            ->orderBy('last_name')
+            ->get();
+
+        return view('staff_details.edit_staff', compact('staff', 'branches', 'supervisors'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $staff = Staff::findOrFail($id);
+
+        $validated = $request->validate([
+            'first_name' => ['required', 'string', 'max:50'],
+            'last_name' => ['required', 'string', 'max:50'],
+            'address' => ['nullable', 'string'],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'sex' => ['nullable', 'string', 'max:10'],
+            'date_of_birth' => ['nullable', 'date'],
+            'nin' => ['nullable', 'string', 'max:20'],
+            'position' => ['required', 'string', 'max:20'],
+            'salary' => ['nullable', 'numeric', 'min:0'],
+            'date_joined' => ['nullable', 'date'],
+            'branch_id' => ['nullable', 'exists:branch,branch_id'],
+            'supervisor_id' => [
+                'nullable',
+                Rule::exists('staff', 'staff_id'),
+                Rule::notIn([$staff->staff_id]),
+            ],
+        ]);
+
+        $staff->update($validated);
+
+        return redirect()
+            ->route('staff.show', $id)
+            ->with('success', 'Staff updated successfully.');
+    }
+
+    public function destroy($id)
+    {
+        $staff = Staff::findOrFail($id);
+
+        if ($staff->user) {
+            $staff->user->delete();
+        }
+
+        $staff->delete();
+
+        return redirect()
+            ->route('staff.index')
+            ->with('success', 'Staff deleted successfully.');
     }
 }

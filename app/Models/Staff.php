@@ -42,4 +42,19 @@ class Staff extends Model
     {
         return $this->hasOne(NextOfKin::class, 'staff_id', 'staff_id');
     }
+
+    public function supervisor()
+    {
+        return $this->belongsTo(Staff::class, 'supervisor_id', 'staff_id');
+    }
+
+    public function subordinates()
+    {
+        return $this->hasMany(Staff::class, 'supervisor_id', 'staff_id');
+    }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class, 'branch_id', 'branch_id');
+    }
 }

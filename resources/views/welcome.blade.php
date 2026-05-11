@@ -235,14 +235,17 @@
             <nav class="nav">
                 <div class="logo">DREAM HOME</div>
                 <ul class="nav-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#find-home">Find a Home</a></li>
+                    <li><a href="#list-property">List Your Property</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#contact">Contact</a></li>
                     @if (Route::has('login'))
                         @auth
                             <li><a href="{{ url('/dashboard') }}">Dashboard</a></li>
                         @else
                             <li><a href="{{ route('login') }}">Log In</a></li>
-                            @if (Route::has('register'))
-                                <li><a href="{{ route('register') }}">Register</a></li>
-                            @endif
                         @endauth
                     @endif
                 </ul>
@@ -250,25 +253,34 @@
 
             <div class="hero-content">
                 <h1 class="hero-title">DREAM HOME</h1>
-                <p class="hero-subtitle">Find Your Perfect Property Today</p>
-                <div class="cta-buttons">
-                    <a href="{{ route('login') }}" class="btn btn-primary">Get Started</a>
-                    <button class="btn btn-secondary" onclick="alert('Explore our amazing properties')">Explore</button>
-                </div>
             </div>
+        </div>
 
-            <div class="features">
-                <div class="feature">
-                    <div class="feature-number">500+</div>
-                    <div class="feature-text">Properties</div>
-                </div>
-                <div class="feature">
-                    <div class="feature-number">10K+</div>
-                    <div class="feature-text">Happy Clients</div>
-                </div>
-                <div class="feature">
-                    <div class="feature-number">24/7</div>
-                    <div class="feature-text">Support</div>
+        <!-- MISSION SECTION -->
+        <div style="background: white; padding: 60px 20px; text-align: center;">
+            <div style="max-width: 900px; margin: 0 auto;">
+                <p style="font-size: 18px; color: #333; line-height: 1.8; margin-bottom: 40px;">
+                    At Dream Home, we believe that a house is more than just a structure—it's the foundation for your best life. As a specialized rental branch, we curate a premium portfolio of homes designed to meet the diverse needs of today's renters. Whether you are a homeowner looking for a trusted partner to care for your property, or a tenant searching for your next great chapter, Dream Home is here to make the transition seamless, comfortable, and rewarding.
+                </p>
+            </div>
+        </div>
+
+        <!-- FEATURED PROPERTIES GRID -->
+        <div style="background: #f5f5f5; padding: 60px 20px;">
+            <div style="max-width: 1000px; margin: 0 auto;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;">
+                    <div style="border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); height: 200px;">
+                        <img src="{{ asset('images/photo1.jpg') }}" alt="Property 1" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div style="border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); height: 200px;">
+                        <img src="{{ asset('images/photo2.jpg') }}" alt="Property 2" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div style="border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); height: 200px;">
+                        <img src="{{ asset('images/photol3.jpg') }}" alt="Property 3" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div style="border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); height: 200px;">
+                        <img src="{{ asset('images/photo1.jpg') }}" alt="Property 4" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
                 </div>
             </div>
         </div>

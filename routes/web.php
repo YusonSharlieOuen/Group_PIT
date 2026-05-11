@@ -17,11 +17,12 @@ Route::get('/', function () {
 });
 
 // FIXED: Changed name from 'find-home' to 'home.find' to match your Nav Bar
-Route::get('/find-a-home', [PropertyController::class, 'index'])->name('home.find');
+Route::get('/find-a-home', function () { return view('find-home-new'); })->name('find-home');
+Route::get('/find-a-home-old', [PropertyController::class, 'index'])->name('home.find');
 
-Route::get('/list-property', function () { return view('list-property'); })->name('property.list');
-Route::get('/services', function () { return view('services'); })->name('services');
-Route::get('/about', function () { return view('about'); })->name('about');
+Route::get('/list-property', function () { return view('list-property-new'); })->name('list-property');
+Route::get('/services', function () { return view('services-new'); })->name('services');
+Route::get('/about', function () { return view('about-new'); })->name('about');
 Route::get('/contact', function () { return view('contact'); })->name('contact');
 
 Route::get('/dashboard', function () {
@@ -35,6 +36,9 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/user_profile', [UserProfileController::class, 'index'])->name('user_profile.index');
 
+    Route::get('/staff', [StaffController::class, 'index'])
+        ->name('staff.index');
+
     Route::get('/staff/create', [StaffController::class, 'create'])
         ->name('staff.create');
 
@@ -43,6 +47,15 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/staff/{id}', [StaffController::class, 'show'])
         ->name('staff.show');
+
+    Route::get('/staff/{id}/edit', [StaffController::class, 'edit'])
+        ->name('staff.edit');
+
+    Route::patch('/staff/{id}', [StaffController::class, 'update'])
+        ->name('staff.update');
+
+    Route::delete('/staff/{id}', [StaffController::class, 'destroy'])
+        ->name('staff.destroy');
 
     Route::get('/staff/{id}/next-of-kin', [StaffController::class, 'createNextOfKin'])
         ->name('staff.nextofkin.create');

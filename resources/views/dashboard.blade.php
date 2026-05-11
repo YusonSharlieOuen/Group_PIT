@@ -28,7 +28,7 @@
                     "At Dream Home, we believe that a house is more than just a structure—it’s the foundation for your best life."
                 </p>
                 <p class="text-gray-100 leading-relaxed text-lg drop-shadow-md">
-                    As a specialized rental branch, we curate a premium portfolio of homes designed to meet the diverse needs of today’s renters. 
+                    As a specialized rental branch, we curate a premium portfolio of homes designed to meet the diverse needs of today's renters. Whether you are a homeowner looking for a trusted partner to care for your property, or a tenant searching for your next great chapter, Dream Home is here to make the transition seamless, comfortable, and rewarding.
                 </p>
             </div>
         </div>

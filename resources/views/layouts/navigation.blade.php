@@ -21,11 +21,15 @@
                         {{ __('Profile') }}
                     </x-nav-link>
 
+                    <x-nav-link :href="route('staff.index')" :active="request()->routeIs('staff.*')">
+                        {{ __('Staff') }}
+                    </x-nav-link>
+
                     <x-nav-link :href="route('home.find')" :active="request()->routeIs('home.find')">
                         {{ __('Find a Home') }}
                     </x-nav-link>
 
-                    <x-nav-link :href="route('property.list')" :active="request()->routeIs('property.list')">
+                    <x-nav-link :href="route('list-property')" :active="request()->routeIs('list-property')">
                         {{ __('List Your Property') }}
                     </x-nav-link>
 

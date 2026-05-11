@@ -10,6 +10,8 @@ class NextOfKin extends Model
 
     protected $primaryKey = 'kin_id';
 
+    public $timestamps = false;
+
     protected $fillable = [
         'staff_id',
         'full_name',
