@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\UserProfileController;
+use App\Http\Controllers\StaffController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -33,6 +34,21 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/user_profile', [UserProfileController::class, 'index'])->name('user_profile.index');
+
+    Route::get('/staff/create', [StaffController::class, 'create'])
+        ->name('staff.create');
+
+    Route::post('/staff/store', [StaffController::class, 'store'])
+        ->name('staff.store');
+
+    Route::get('/staff/{id}', [StaffController::class, 'show'])
+        ->name('staff.show');
+
+    Route::get('/staff/{id}/next-of-kin', [StaffController::class, 'createNextOfKin'])
+        ->name('staff.nextofkin.create');
+
+    Route::post('/staff/{id}/next-of-kin', [StaffController::class, 'storeNextOfKin'])
+        ->name('staff.nextofkin.store');
 });
 
 require __DIR__.'/auth.php';

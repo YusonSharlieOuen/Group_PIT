@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\user_profile;
+use App\Models\Admin;
 use Illuminate\Http\Request;
 
-class UserProfileController extends Controller
+class AdminController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return view('user_profile.user_profile');
+        return view('Admin.admin_page');
     }
 
     /**
@@ -34,7 +34,7 @@ class UserProfileController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(user_profile $user_profile)
+    public function show(Admin $admin)
     {
         //
     }
@@ -42,7 +42,7 @@ class UserProfileController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(user_profile $user_profile)
+    public function edit(Admin $admin)
     {
         //
     }
@@ -50,7 +50,7 @@ class UserProfileController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, user_profile $user_profile)
+    public function update(Request $request, Admin $admin)
     {
         //
     }
@@ -58,7 +58,7 @@ class UserProfileController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(user_profile $user_profile)
+    public function destroy(Admin $admin)
     {
         //
     }
