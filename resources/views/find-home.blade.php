@@ -1,81 +1,111 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Find a Home') }}
-        </h2>
-    </x-slot>
+    <div class="w-full h-[220px] bg-cover bg-center relative flex items-center justify-center" style="background-image: url('{{ asset('images/photo4.jpg') }}');">
+        <div class="absolute inset-0 bg-black/30"></div>
+        <h1 class="relative z-10 text-white text-5xl md:text-6xl font-serif tracking-[0.2em] uppercase opacity-90 drop-shadow-lg">
+            Dream Home
+        </h1>
+    </div>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="bg-white min-h-screen pb-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
-            <!-- Search & Filter Bar -->
-            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex flex-wrap gap-4 items-end mb-8">
-                <div class="flex-grow min-w-[250px]">
-                    <div class="relative flex items-center">
-                        <input type="text" placeholder="Location (City, Zip, or Address)" class="w-full pl-4 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500 text-sm">
-                    </div>
-                </div>
+            <div class="relative z-20 -mt-8 mb-4 max-w-4xl mx-auto">
+                <form action="{{ route('home.find') }}" method="GET" class="bg-white rounded-xl shadow-lg border border-gray-200 p-1.5 flex items-center">
+                    <svg class="h-6 w-6 text-gray-400 ml-3 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input type="text" name="search" value="{{ request('search') }}" 
+                           placeholder="Enter City, Neighborhood, or Zip Code" 
+                           class="flex-1 border-none outline-none focus:ring-0 text-gray-700 py-2 sm:text-lg">
+                    <button type="submit" class="bg-[#5c9aa9] text-white px-8 py-2.5 rounded-lg font-medium hover:bg-[#4a8291] transition shadow-sm">
+                        Search
+                    </button>
+                </form>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-3 mb-10 max-w-5xl mx-auto">
+                <select name="type" class="bg-gray-50 border border-gray-200 text-gray-700 py-2 px-4 rounded-md text-sm focus:ring-[#5c9aa9] focus:border-[#5c9aa9] shadow-sm font-medium cursor-pointer">
+                    <option value="">Property Type</option>
+                    <option value="House" {{ request('type') == 'House' ? 'selected' : '' }}>House</option>
+                    <option value="Condo" {{ request('type') == 'Condo' ? 'selected' : '' }}>Condo</option>
+                </select>
                 
-                <div>
-                    <label class="block text-xs font-medium text-gray-700 mb-1">Price Range</label>
-                    <div class="flex items-center space-x-2">
-                        <input type="text" placeholder="min" class="w-24 px-3 py-2 border border-gray-300 rounded-md text-sm">
-                        <span class="text-gray-400">-</span>
-                        <input type="text" placeholder="max" class="w-24 px-3 py-2 border border-gray-300 rounded-md text-sm">
-                    </div>
-                </div>
+                <select class="bg-gray-50 border border-gray-200 text-gray-700 py-2 px-4 rounded-md text-sm focus:ring-[#5c9aa9] focus:border-[#5c9aa9] shadow-sm font-medium cursor-pointer">
+                    <option value="">Price Range</option>
+                </select>
 
-                <div>
-                    <label class="block text-xs font-medium text-gray-700 mb-1">Property Type</label>
-                    <select class="w-48 px-3 py-2 border border-gray-300 rounded-md text-sm bg-white">
-                        <option>House, Condo, Townhome</option>
-                    </select>
-                </div>
+                <select class="bg-gray-50 border border-gray-200 text-gray-700 py-2 px-4 rounded-md text-sm focus:ring-[#5c9aa9] focus:border-[#5c9aa9] shadow-sm font-medium cursor-pointer">
+                    <option value="">Beds/Baths</option>
+                </select>
 
-                <button class="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition text-sm font-medium">
+                <select class="bg-gray-50 border border-gray-200 text-gray-700 py-2 px-4 rounded-md text-sm focus:ring-[#5c9aa9] focus:border-[#5c9aa9] shadow-sm font-medium cursor-pointer">
+                    <option value="">Square Feet</option>
+                </select>
+
+                <button type="submit" class="bg-[#b39e60] text-white px-8 py-2 rounded-md font-medium hover:bg-[#9c8952] transition text-sm shadow-sm">
                     Search
                 </button>
             </div>
 
-            <!-- Two Column Layout -->
-            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 
-                <!-- Left Column: Property List -->
-                <div class="lg:col-span-3">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="lg:col-span-7">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         
-                        {{-- START OF DYNAMIC LOOP --}}
-                        @forelse($properties as $property)
-                            <div class="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition">
-                                <img src="{{ asset('storage/' . $property->image_path) }}" class="w-full h-48 object-cover" alt="{{ $property->title }}">
-                                <div class="p-4">
-                                    <h3 class="text-xl font-bold text-gray-900">${{ number_format($property->price) }}</h3>
-                                    <p class="text-sm text-gray-600 mt-1">{{ $property->address }}</p>
-                                    <p class="text-sm text-gray-500 mt-1">
-                                        {{ $property->beds }} Beds | {{ $property->baths }} Baths | {{ number_format($property->sqft) }} sq ft
-                                    </p>
-                                    <div class="flex justify-between items-center mt-4">
-                                        <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">{{ $property->type }}</span>
-                                        <button class="border border-gray-300 text-gray-700 text-sm px-3 py-1 rounded hover:bg-gray-50">Details</button>
-                                    </div>
+                        <div class="bg-white rounded-2xl border-2 border-[#5c9aa9] overflow-hidden flex flex-col shadow-md">
+                            <div class="h-48 w-full bg-gray-200">
+                                <img src="{{ asset('images/house1.jpg') }}" class="w-full h-full object-cover" alt="Villa" onerror="this.style.display='none'">
+                            </div>
+                            <div class="p-4 flex flex-col flex-1">
+                                <h3 class="font-bold text-gray-900 text-lg leading-tight mb-1">Address Villa, Mianan</h3>
+                                <div class="flex justify-between items-baseline mb-2">
+                                    <span class="text-gray-900 font-extrabold text-xl">$850,000</span>
+                                    <span class="text-gray-800 font-bold text-sm">3 Bd, 2 Ba</span>
+                                </div>
+                                <p class="text-gray-600 text-xs mb-4 line-clamp-3 leading-relaxed flex-1">
+                                    A modern piece of architecture right on the beachfront with complete home amenities.
+                                </p>
+                                <div class="flex gap-2 mt-auto">
+                                    <button class="flex-1 bg-[#e8e6df] text-gray-800 py-2.5 rounded-lg text-xs font-bold hover:bg-gray-300 transition">Save Property</button>
+                                    <button class="flex-1 bg-[#6caec1] text-white py-2.5 rounded-lg text-xs font-bold hover:bg-[#5a93a3] transition">View Details</button>
                                 </div>
                             </div>
-                        @empty
-                            <div class="col-span-2 py-10 text-center">
-                                <p class="text-gray-500">No properties found.</p>
+                        </div>
+
+                        <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden flex flex-col shadow-sm hover:shadow-md transition">
+                            <div class="h-48 w-full bg-gray-200">
+                                <img src="{{ asset('images/house2.jpg') }}" class="w-full h-full object-cover" alt="Brick Home" onerror="this.style.display='none'">
                             </div>
-                        @endforelse
-                        {{-- END OF DYNAMIC LOOP --}}
+                            <div class="p-4 flex flex-col flex-1">
+                                <h3 class="font-bold text-gray-900 text-lg leading-tight mb-1">Address Brick home</h3>
+                                <div class="flex justify-between items-baseline mb-2">
+                                    <span class="text-gray-900 font-extrabold text-xl">$750,000</span>
+                                    <span class="text-gray-800 font-bold text-sm">3 Bd, 2 Ba</span>
+                                </div>
+                                <p class="text-gray-600 text-xs mb-4 line-clamp-3 leading-relaxed flex-1">
+                                    Traditional consolidated brick home fit for a family seeking comfort and stability.
+                                </p>
+                                <div class="flex gap-2 mt-auto">
+                                    <button class="flex-1 bg-[#e8e6df] text-gray-800 py-2.5 rounded-lg text-xs font-bold hover:bg-gray-300 transition">Save Property</button>
+                                    <button class="flex-1 bg-[#6caec1] text-white py-2.5 rounded-lg text-xs font-bold hover:bg-[#5a93a3] transition">View Details</button>
+                                </div>
+                            </div>
+                        </div>
 
                     </div>
                 </div>
 
-                <!-- Right Column: Map Placeholder -->
-                <div class="lg:col-span-2">
-                    <div class="bg-gray-100 w-full h-[500px] rounded-xl border border-gray-300 flex items-center justify-center sticky top-6">
-                        <div class="text-center p-6">
-                            <p class="text-gray-500 font-medium">Interactive Map View</p>
-                            <p class="text-xs text-gray-400 mt-2">(Integration with Leaflet or Google Maps recommended)</p>
+                <div class="lg:col-span-5 relative">
+                    <div class="sticky top-6 w-full h-[700px] bg-[#eef3f2] rounded-3xl overflow-hidden shadow-inner border-[6px] border-white flex flex-col items-center justify-center">
+                        
+                        <img src="{{ asset('images/map-placeholder.jpg') }}" class="absolute inset-0 w-full h-full object-cover z-0" alt="Map" onerror="this.style.display='none'">
+                        
+                        <div class="relative z-10 text-center p-6 bg-white/80 rounded-xl backdrop-blur-sm border border-gray-200 shadow-sm">
+                            <svg class="w-12 h-12 text-[#5c9aa9] mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+                            </svg>
+                            <h4 class="font-bold text-gray-800 text-lg">Interactive Map</h4>
+                            <p class="text-sm text-gray-500 mt-1">Property locations will appear here.</p>
                         </div>
                     </div>
                 </div>

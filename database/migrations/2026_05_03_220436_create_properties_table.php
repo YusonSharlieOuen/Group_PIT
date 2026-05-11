@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->string('address');
-            $table->decimal('price', 15, 2);
+            $table->decimal('price');
             $table->integer('beds');
             $table->integer('baths');
             $table->integer('sqft');
