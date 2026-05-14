@@ -35,7 +35,7 @@
                     </div>
                     <div>
                         <dt class="text-xs font-semibold uppercase tracking-wider text-gray-500">Salary</dt>
-                        <dd class="mt-1 text-sm text-gray-900">{{ is_null($staff->salary) ? 'N/A' : 'GBP ' . number_format($staff->salary, 2) }}</dd>
+                        <dd class="mt-1 text-sm text-gray-900">{{ is_null($staff->salary) ? 'N/A' : 'PHP ' . number_format($staff->salary, 2) }}</dd>
                     </div>
                     <div>
                         <dt class="text-xs font-semibold uppercase tracking-wider text-gray-500">Phone</dt>

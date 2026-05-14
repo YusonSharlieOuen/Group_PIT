@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Branch;
 use App\Models\Staff;
 use App\Models\NextOfKin;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Hash;
 
 class StaffController extends Controller
 {
@@ -61,9 +63,17 @@ class StaffController extends Controller
         return view('staff_details.staff_details', compact('staff'));
     }
 
+    /*
+    NEXT OF KIN
+    */
+
     public function createNextOfKin($id)
     {
         $staff = Staff::findOrFail($id);
+
+        /*
+        Prevent duplicate next of kin
+        */
 
         if ($staff->nextOfKin) {
             return back()->with('error', 'Next of kin already exists.');

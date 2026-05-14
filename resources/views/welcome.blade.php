@@ -7,104 +7,123 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=poppins:400,500,600,700&display=swap" rel="stylesheet" />
     </head>
-    <body style="margin: 0; padding: 0; font-family: 'Poppins', sans-serif; min-height: 100vh;">
+    <body>
         <style>
             * {
                 margin: 0;
                 padding: 0;
                 box-sizing: border-box;
             }
+
+            html,
             body {
+                width: 100%;
+                min-height: 100%;
+                overflow-x: hidden;
                 font-family: 'Poppins', sans-serif;
             }
+
             .hero {
-                background: linear-gradient(135deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.2) 100%), url('/images/photo2.jpg') center/cover no-repeat;
-                background-size: 1920px 1080px;
-                background-attachment: fixed;
+                position: relative;
+                width: 100vw;
                 min-height: 100vh;
                 display: flex;
                 flex-direction: column;
-                justify-content: center;
                 align-items: center;
-                padding: 0 20px;
-                position: relative;
+                justify-content: center;
+                padding: 96px 20px 40px;
                 overflow: hidden;
+                background:
+                    linear-gradient(135deg, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.25)),
+                    url("{{ asset('images/photo2.jpg') }}") center center / cover no-repeat fixed;
             }
+
             .hero::before {
                 content: '';
                 position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.4));
+                inset: 0;
+                background: linear-gradient(to bottom, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.42));
                 z-index: 1;
             }
+
             .nav {
                 position: fixed;
                 top: 0;
                 left: 0;
                 right: 0;
                 z-index: 100;
-                width: 100%;
                 display: flex;
-                justify-content: space-between;
                 align-items: center;
+                justify-content: space-between;
+                gap: 24px;
                 padding: 20px 40px;
                 background: rgba(0, 0, 0, 0.3);
                 backdrop-filter: blur(10px);
             }
+
             .logo {
+                flex: 0 0 auto;
                 color: white;
                 font-size: 28px;
                 font-weight: 700;
                 letter-spacing: 2px;
-                text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+                text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+                white-space: nowrap;
             }
+
             .nav-links {
                 display: flex;
-                gap: 30px;
+                align-items: center;
+                justify-content: flex-end;
+                gap: 20px;
                 list-style: none;
+                flex-wrap: wrap;
             }
+
             .nav-links a {
+                display: inline-block;
                 color: white;
                 text-decoration: none;
                 font-weight: 500;
                 font-size: 14px;
-                padding: 10px 20px;
+                padding: 10px 14px;
                 border: 2px solid transparent;
                 border-radius: 4px;
                 transition: all 0.3s ease;
-                text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+                text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+                white-space: nowrap;
             }
+
             .nav-links a:hover {
                 border-color: white;
-                background: rgba(255,255,255,0.1);
+                background: rgba(255, 255, 255, 0.1);
             }
+
             .hero-content {
                 position: relative;
                 z-index: 5;
                 text-align: center;
                 color: white;
-                margin-top: 0;
-                margin-top: 60px;
             }
+
             .hero-title {
-                font-size: 72px;
+                font-size: clamp(42px, 8vw, 72px);
                 font-weight: 700;
                 letter-spacing: 4px;
                 margin-bottom: 20px;
-                text-shadow: 3px 3px 12px rgba(0,0,0,0.5);
+                text-shadow: 3px 3px 12px rgba(0, 0, 0, 0.5);
                 animation: fadeInDown 0.8s ease-out;
             }
+
             .hero-subtitle {
                 font-size: 18px;
                 font-weight: 300;
                 margin-bottom: 40px;
-                text-shadow: 2px 2px 8px rgba(0,0,0,0.4);
+                text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4);
                 letter-spacing: 1px;
                 animation: fadeInUp 0.8s ease-out 0.2s backwards;
             }
+
             .cta-buttons {
                 display: flex;
                 gap: 20px;
@@ -112,56 +131,88 @@
                 flex-wrap: wrap;
                 animation: fadeInUp 0.8s ease-out 0.4s backwards;
             }
+
             .btn {
+                display: inline-block;
                 padding: 14px 40px;
+                color: white;
+                font-family: 'Poppins', sans-serif;
                 font-size: 15px;
                 font-weight: 600;
+                letter-spacing: 1px;
+                text-decoration: none;
                 border: 2px solid white;
                 border-radius: 4px;
                 cursor: pointer;
                 transition: all 0.3s ease;
-                text-decoration: none;
-                display: inline-block;
-                letter-spacing: 1px;
-                font-family: 'Poppins', sans-serif;
             }
+
             .btn-primary {
                 background: white;
                 color: #2c2c2c;
             }
+
             .btn-primary:hover {
-                background: rgba(255,255,255,0.9);
+                background: rgba(255, 255, 255, 0.9);
                 transform: translateY(-2px);
-                box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             }
+
             .btn-secondary {
                 background: transparent;
-                color: white;
-                border-color: white;
             }
+
             .btn-secondary:hover {
-                background: rgba(255,255,255,0.1);
+                background: rgba(255, 255, 255, 0.1);
                 transform: translateY(-2px);
-                box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             }
-            .features {
-                display: none;
-            }
-            .feature {
+
+            .mission {
+                background: white;
+                padding: 60px 20px;
                 text-align: center;
-                color: white;
             }
-            .feature-number {
-                font-size: 32px;
-                font-weight: 700;
-                margin-bottom: 5px;
-                text-shadow: 2px 2px 8px rgba(0,0,0,0.4);
+
+            .mission-inner {
+                max-width: 900px;
+                margin: 0 auto;
             }
-            .feature-text {
-                font-size: 14px;
-                font-weight: 500;
-                text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+
+            .mission-text {
+                color: #333;
+                font-size: 18px;
+                line-height: 1.8;
+                margin-bottom: 40px;
             }
+
+            .featured-properties {
+                background: #f5f5f5;
+                padding: 60px 20px;
+            }
+
+            .property-grid {
+                max-width: 1000px;
+                margin: 0 auto;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 30px;
+            }
+
+            .property-card {
+                height: 200px;
+                overflow: hidden;
+                border-radius: 8px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            .property-card img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+
             @keyframes fadeInDown {
                 from {
                     opacity: 0;
@@ -172,6 +223,7 @@
                     transform: translateY(0);
                 }
             }
+
             @keyframes fadeInUp {
                 from {
                     opacity: 0;
@@ -182,69 +234,64 @@
                     transform: translateY(0);
                 }
             }
-            @keyframes fadeIn {
-                from {
-                    opacity: 0;
+
+            @media (max-width: 900px) {
+                .nav {
+                    align-items: flex-start;
+                    flex-direction: column;
+                    padding: 16px 20px;
                 }
-                to {
-                    opacity: 1;
+
+                .nav-links {
+                    justify-content: flex-start;
+                    gap: 8px;
                 }
-            }
-            @media (max-width: 768px) {
+
+                .nav-links a {
+                    padding: 7px 10px;
+                    font-size: 12px;
+                }
+
+                .logo {
+                    font-size: 20px;
+                }
+
+                .hero {
+                    padding-top: 150px;
+                    background-attachment: scroll;
+                }
+
                 .hero-title {
-                    font-size: 42px;
                     letter-spacing: 2px;
-                    margin-top: 50px;
                 }
+
                 .hero-subtitle {
                     font-size: 14px;
                 }
-                .nav {
-                    padding: 15px 20px;
-                    flex-direction: row;
-                    gap: 10px;
-                }
-                .nav-links {
-                    gap: 10px;
-                    flex-wrap: wrap;
-                    justify-content: flex-end;
-                }
-                .nav-links a {
-                    padding: 8px 12px;
-                    font-size: 12px;
-                }
-                .logo {
-                    font-size: 18px;
-                }
-                .features {
-                    flex-direction: column;
-                    gap: 40px;
-                    bottom: 60px;
-                }
+
                 .btn {
                     padding: 12px 30px;
                     font-size: 13px;
                 }
-                .hero-content {
-                    margin-top: 40px;
-                }
             }
         </style>
 
-        <div class="hero">
+        <div class="hero" id="home">
             <nav class="nav">
                 <div class="logo">DREAM HOME</div>
                 <ul class="nav-links">
-                    <li><a href="#home">Home</a></li>
-                    <li><a href="#find-home">Find a Home</a></li>
-                    <li><a href="#list-property">List Your Property</a></li>
-                    <li><a href="#services">Services</a></li>
-                    <li><a href="#about">About Us</a></li>
-                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="{{ route('home.find') }}">Find a Home</a></li>
+                    <li><a href="{{ route('property.list') }}">List Your Property</a></li>
+                    <li><a href="{{ route('services') }}">Services</a></li>
+                    <li><a href="{{ route('about') }}">About Us</a></li>
+                    <li><a href="{{ route('contact') }}">Contact</a></li>
                     @if (Route::has('login'))
                         @auth
                             <li><a href="{{ url('/dashboard') }}">Dashboard</a></li>
                         @else
+                            @if (Route::has('register'))
+                                <li><a href="{{ route('register') }}">Register</a></li>
+                            @endif
                             <li><a href="{{ route('login') }}">Log In</a></li>
                         @endauth
                     @endif
@@ -256,33 +303,29 @@
             </div>
         </div>
 
-        <!-- MISSION SECTION -->
-        <div style="background: white; padding: 60px 20px; text-align: center;">
-            <div style="max-width: 900px; margin: 0 auto;">
-                <p style="font-size: 18px; color: #333; line-height: 1.8; margin-bottom: 40px;">
-                    At Dream Home, we believe that a house is more than just a structure—it's the foundation for your best life. As a specialized rental branch, we curate a premium portfolio of homes designed to meet the diverse needs of today's renters. Whether you are a homeowner looking for a trusted partner to care for your property, or a tenant searching for your next great chapter, Dream Home is here to make the transition seamless, comfortable, and rewarding.
+        <section class="mission">
+            <div class="mission-inner">
+                <p class="mission-text">
+                    At Dream Home, we believe that a house is more than just a structure. It is the foundation for your best life. As a specialized rental branch, we curate a premium portfolio of homes designed to meet the diverse needs of today's renters. Whether you are a homeowner looking for a trusted partner to care for your property, or a tenant searching for your next great chapter, Dream Home is here to make the transition seamless, comfortable, and rewarding.
                 </p>
             </div>
-        </div>
+        </section>
 
-        <!-- FEATURED PROPERTIES GRID -->
-        <div style="background: #f5f5f5; padding: 60px 20px;">
-            <div style="max-width: 1000px; margin: 0 auto;">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;">
-                    <div style="border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); height: 200px;">
-                        <img src="{{ asset('images/photo1.jpg') }}" alt="Property 1" style="width: 100%; height: 100%; object-fit: cover;">
-                    </div>
-                    <div style="border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); height: 200px;">
-                        <img src="{{ asset('images/photo2.jpg') }}" alt="Property 2" style="width: 100%; height: 100%; object-fit: cover;">
-                    </div>
-                    <div style="border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); height: 200px;">
-                        <img src="{{ asset('images/photol3.jpg') }}" alt="Property 3" style="width: 100%; height: 100%; object-fit: cover;">
-                    </div>
-                    <div style="border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); height: 200px;">
-                        <img src="{{ asset('images/photo1.jpg') }}" alt="Property 4" style="width: 100%; height: 100%; object-fit: cover;">
-                    </div>
+        <section class="featured-properties">
+            <div class="property-grid">
+                <div class="property-card">
+                    <img src="{{ asset('images/photo1.jpg') }}" alt="Property 1">
+                </div>
+                <div class="property-card">
+                    <img src="{{ asset('images/photo2.jpg') }}" alt="Property 2">
+                </div>
+                <div class="property-card">
+                    <img src="{{ asset('images/photol3.jpg') }}" alt="Property 3">
+                </div>
+                <div class="property-card">
+                    <img src="{{ asset('images/photo4.jpg') }}" alt="Property 4">
                 </div>
             </div>
-        </div>
+        </section>
     </body>
 </html>

@@ -2,17 +2,32 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Property;
+use Illuminate\Http\Request;
 
 class PropertyController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // DEBUG STEP: If you see this message on your screen, the route is fixed.
-        // dd('The controller is finally reached!'); 
+        $query = Property::query();
 
-        $properties = Property::all(); 
+        if ($request->filled('search')) {
+            $query->where('address', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        if ($request->filled('min_price')) {
+            $query->where('price', '>=', $request->min_price);
+        }
+
+        if ($request->filled('max_price')) {
+            $query->where('price', '<=', $request->max_price);
+        }
+
+        $properties = $query->get();
 
         return view('find-home', compact('properties'));
     }
