@@ -4,9 +4,16 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\LeaseController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ManagerController;
+use App\Http\Controllers\NextOfKinController;
+use App\Http\Controllers\RenterController;
+use App\Http\Controllers\SupervisorController;
+use App\Http\Controllers\PropertyDetailsController;
+use App\Http\Controllers\ViewingController;
+use App\Http\Controllers\BranchController;
 use Illuminate\Support\Facades\Route;
-
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -36,6 +43,14 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/user_profile', [UserProfileController::class, 'index'])->name('user_profile.index');
 
+    Route::get('/staff', [StaffController::class, 'index'])
+        ->name('staff.index');
+
+    Route::get('/branch', [BranchController::class, 'index'])
+        ->name('branch.index');
+
+    Route::get('/create_lease', [LeaseController::class, 'index'])->name('Lease.index');
+
     Route::get('/staff/create', [StaffController::class, 'create'])
         ->name('staff.create');
 
@@ -45,21 +60,43 @@ Route::middleware('auth')->group(function () {
     Route::get('/staff/{id}', [StaffController::class, 'show'])
         ->name('staff.show');
 
+    Route::get('/staff/{id}/edit', [StaffController::class, 'edit'])
+        ->name('staff.edit');
+
+    Route::patch('/staff/{id}', [StaffController::class, 'update'])
+        ->name('staff.update');
+
+    Route::delete('/staff/{id}', [StaffController::class, 'destroy'])
+        ->name('staff.destroy');
+
     Route::get('/staff/{id}/next-of-kin', [StaffController::class, 'createNextOfKin'])
         ->name('staff.nextofkin.create');
 
     Route::post('/staff/{id}/next-of-kin', [StaffController::class, 'storeNextOfKin'])
         ->name('staff.nextofkin.store');
-    
 
-    Route::get('/debug-db', function () {
-    try {
-        $properties = DB::table('property')->get();
-        return response()->json($properties);
-    } catch (\Exception $e) {
-        return "Error connecting to database: " . $e->getMessage();
-    }
-});
+    Route::get('/lease/create', [LeaseController::class, 'create'])
+        ->name('lease.create');
+
+    Route::post('/lease/store', [LeaseController::class, 'store'])
+        ->name('lease.store');
+
+    Route::get('/property', [PropertyDetailsController::class, 'index'])
+        ->name('property.index');
+
+    Route::get('/property/create', [PropertyDetailsController::class, 'create'])
+        ->name('property.create');
+
+    Route::get('/property/{id}', [PropertyDetailsController::class, 'show'])
+        ->name('property.show');
+
+    Route::get('/get-staff/{branch_id}', [PropertyDetailsController::class, 'getStaffByBranch']);
+
+    Route::get('/viewing/create', [ViewingController::class, 'create'])
+        ->name('viewing.create');
+
+    Route::post('/viewing/store', [ViewingController::class, 'store'])
+        ->name('viewing.store');
 });
 
 require __DIR__.'/auth.php';
