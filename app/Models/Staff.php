@@ -57,4 +57,9 @@ class Staff extends Model
     {
         return $this->belongsTo(Branch::class, 'branch_id', 'branch_id');
     }
+
+    public function assignedProperties()
+    {
+        return $this->hasMany(PropertyDetails::class, 'staff_id', 'staff_id');
+    }
 }

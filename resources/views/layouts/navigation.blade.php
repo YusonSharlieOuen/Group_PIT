@@ -21,6 +21,10 @@
                         {{ __('Staff') }}
                     </x-nav-link>
 
+                    <x-nav-link :href="route('branch.index')" :active="request()->routeIs('branch.*')">
+                        {{ __('Branches') }}
+                    </x-nav-link>
+
                     <x-nav-link :href="route('home.find')" :active="request()->routeIs('home.find')">
                         {{ __('Find a Home') }}
                     </x-nav-link>
@@ -94,6 +98,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('staff.index')" :active="request()->routeIs('staff.*')">
                 {{ __('Staff') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('branch.index')" :active="request()->routeIs('branch.*')">
+                {{ __('Branches') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('home.find')" :active="request()->routeIs('home.find')">
                 {{ __('Find a Home') }}
