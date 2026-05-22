@@ -8,6 +8,7 @@ use App\Models\NextOfKin;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Hash;
 
 class StaffController extends Controller
@@ -46,12 +47,30 @@ class StaffController extends Controller
             'date_joined' => ['nullable', 'date'],
             'branch_id' => ['nullable', 'exists:branch,branch_id'],
             'supervisor_id' => ['nullable', 'exists:staff,staff_id', 'different:staff_id'],
+            'email' => ['nullable', 'string', 'email', 'max:255', 'unique:'.User::class],
+            'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        Staff::create($validated);
+        if ($validated['email'] && empty($validated['password'])) {
+            return back()->withInput()->withErrors(['password' => 'Password is required when email is provided.']);
+        }
+
+        $staffData = collect($validated)->except(['email', 'password', 'password_confirmation'])->toArray();
+        $staff = Staff::create($staffData);
+
+        if (! empty($validated['email'])) {
+            $user = User::create([
+                'name' => $validated['first_name'] . ' ' . $validated['last_name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+            ]);
+
+            $staff->user_id = $user->id;
+            $staff->save();
+        }
 
         return redirect()
-            ->route('staff.show', $validated['staff_id'])
+            ->route('staff.show', $staff->staff_id)
             ->with('success', 'Staff created successfully.');
     }
 

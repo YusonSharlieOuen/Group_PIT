@@ -43,6 +43,9 @@
                             <option>Manila, Philippines</option>
                             <option>Cebu City</option>
                             <option>Davao City</option>
+                            <option>Quezon City</option>
+                            <option>Pasig City</option>
+                            <option>Taguig City</option>
                         </select>
                     </div>
                     <div>

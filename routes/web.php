@@ -25,6 +25,7 @@ Route::get('/', function () {
 });
 
 // FIXED: Changed name from 'find-home' to 'home.find' to match your Nav Bar
+Route::post('/property/store', [PropertyController::class, 'store'])->name('property.store');
 Route::get('/find-a-home', [PropertyController::class, 'index'])->name('home.find');
 Route::get('/list-property', function () { return view('list-property'); })->name('property.list');
 Route::get('/services', function () { return view('services'); })->name('services');
@@ -84,9 +85,6 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/property/create', [PropertyDetailsController::class, 'create'])
         ->name('property.create');
-
-    Route::get('/property/store', [PropertyDetailsController::class, 'store'])
-        ->name('property.store');
 
     Route::get('/property/{id}', [PropertyDetailsController::class, 'show'])
         ->name('property.show');
