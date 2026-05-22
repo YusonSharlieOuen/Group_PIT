@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PropertyDetails;
-use App\Models\Viewing;
-use App\Models\Renter;
 use App\Models\Branch;
+use App\Models\PropertyDetails;
 use App\Models\Staff;
+use App\Models\Viewing;
 use Illuminate\Http\Request;
 
 class PropertyDetailsController extends Controller
@@ -40,9 +39,9 @@ class PropertyDetailsController extends Controller
         $number = 1;
 
         do {
-            $propertyId = 'P' . $number;
+            $propertyId = 'P'.$number;
 
-            $exists = \App\Models\PropertyDetails::where('property_id', $propertyId)->exists();
+            $exists = PropertyDetails::where('property_id', $propertyId)->exists();
 
             $number++;
 
@@ -62,10 +61,10 @@ class PropertyDetailsController extends Controller
     public function getStaffByBranch($branch_id)
     {
         $staff = Staff::where('branch_id', $branch_id)
-        ->where('position', 'Staff')
-        ->get();
+            ->where('position', 'Staff')
+            ->get();
 
-    return response()->json($staff);
+        return response()->json($staff);
     }
 
     /**
@@ -74,47 +73,46 @@ class PropertyDetailsController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-        'property_id' => 'required|unique:property,property_id',
-        'street' => 'required',
-        'area' => 'required',
-        'city' => 'required',
-        'postcode' => 'required',
-        'property_type' => 'required',
-        'number_of_rooms' => 'required|integer',
-        'monthly_rent' => 'required|numeric',
-        'branch_id' => 'nullable|exists:branch,branch_id',
-        'staff_id' => 'nullable|exists:staff,staff_id',
-    ]);
+            'property_id' => 'required|unique:property,property_id',
+            'street' => 'required',
+            'area' => 'required',
+            'city' => 'required',
+            'postcode' => 'required',
+            'property_type' => 'required',
+            'number_of_rooms' => 'required|integer',
+            'monthly_rent' => 'required|numeric',
+            'branch_id' => 'nullable|exists:branch,branch_id',
+            'staff_id' => 'nullable|exists:staff,staff_id',
+        ]);
 
-    PropertyDetails::create([
-        'property_id' => $request->property_id,
-        'street' => $request->street,
-        'area' => $request->area,
-        'city' => $request->city,
-        'postcode' => $request->postcode,
-        'property_type' => $request->property_type,
-        'number_of_rooms' => $request->number_of_rooms,
-        'monthly_rent' => $request->monthly_rent,
-        'status' => 'Available',
-        'branch_id' => $request->branch_id ?? null,
-        'staff_id' => $request->staff_id ?? null,
-    ]);
+        PropertyDetails::create([
+            'property_id' => $request->property_id,
+            'street' => $request->street,
+            'area' => $request->area,
+            'city' => $request->city,
+            'postcode' => $request->postcode,
+            'property_type' => $request->property_type,
+            'number_of_rooms' => $request->number_of_rooms,
+            'monthly_rent' => $request->monthly_rent,
+            'status' => 'Available',
+            'branch_id' => $request->branch_id ?? null,
+            'staff_id' => $request->staff_id ?? null,
+        ]);
 
-    return redirect()
-        ->route('property.index')
-        ->with('success', 'Property created successfully.');
+        return redirect()
+            ->route('property.index')
+            ->with('success', 'Property created successfully.');
     }
 
     /**
      * Display the specified resource.
      */
-
     public function show($id)
     {
         // $property = PropertyDetails::find($id);
-        
+
         $property = PropertyDetails::findOrFail($id);
-        
+
         $viewings = Viewing::where('property_id', $id)->get();
 
         // dd($property);
@@ -123,7 +121,6 @@ class PropertyDetailsController extends Controller
             'Property.show_property',
             compact('property', 'viewings')
         );
-        
 
     }
 
@@ -150,6 +147,4 @@ class PropertyDetailsController extends Controller
     {
         //
     }
-
-
 }

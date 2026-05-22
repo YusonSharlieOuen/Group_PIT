@@ -17,7 +17,7 @@ class NextOfKin extends Model
         'full_name',
         'relationship',
         'address',
-        'phone'
+        'phone',
     ];
 
     public function staff()

@@ -27,7 +27,7 @@ class PropertyDetails extends Model
         'monthly_rent',
         'status',
         'branch_id',
-        'staff_id'
+        'staff_id',
     ];
 
     /*

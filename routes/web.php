@@ -1,19 +1,15 @@
 <?php
 
+use App\Http\Controllers\BranchController;
+use App\Http\Controllers\LeaseController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PropertyController;
-use App\Http\Controllers\UserProfileController;
-use App\Http\Controllers\StaffController;
-use App\Http\Controllers\LeaseController;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\ManagerController;
-use App\Http\Controllers\NextOfKinController;
-use App\Http\Controllers\RenterController;
-use App\Http\Controllers\SupervisorController;
 use App\Http\Controllers\PropertyDetailsController;
+use App\Http\Controllers\StaffController;
+use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\ViewingController;
-use App\Http\Controllers\BranchController;
 use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -27,10 +23,18 @@ Route::get('/', function () {
 // FIXED: Changed name from 'find-home' to 'home.find' to match your Nav Bar
 Route::post('/property/store', [PropertyController::class, 'store'])->name('property.store');
 Route::get('/find-a-home', [PropertyController::class, 'index'])->name('home.find');
-Route::get('/list-property', function () { return view('list-property'); })->name('property.list');
-Route::get('/services', function () { return view('services'); })->name('services');
-Route::get('/about', function () { return view('about'); })->name('about');
-Route::get('/contact', function () { return view('contact'); })->name('contact');
+Route::get('/list-property', function () {
+    return view('list-property');
+})->name('property.list');
+Route::get('/services', function () {
+    return view('services');
+})->name('services');
+Route::get('/about', function () {
+    return view('about');
+})->name('about');
+Route::get('/contact', function () {
+    return view('contact');
+})->name('contact');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -46,8 +50,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/staff', [StaffController::class, 'index'])
         ->name('staff.index');
 
-    Route::get('/branch', [BranchController::class, 'index'])
-        ->name('branch.index');
+    Route::resource('branch', BranchController::class);
 
     Route::get('/create_lease', [LeaseController::class, 'index'])->name('Lease.index');
 

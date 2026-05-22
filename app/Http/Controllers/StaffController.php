@@ -3,13 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Branch;
-use App\Models\Staff;
 use App\Models\NextOfKin;
+use App\Models\Staff;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class StaffController extends Controller
 {
@@ -60,7 +59,7 @@ class StaffController extends Controller
 
         if (! empty($validated['email'])) {
             $user = User::create([
-                'name' => $validated['first_name'] . ' ' . $validated['last_name'],
+                'name' => $validated['first_name'].' '.$validated['last_name'],
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
             ]);
@@ -76,7 +75,7 @@ class StaffController extends Controller
 
     public function show($id)
     {
-        $staff = Staff::with(['branch', 'supervisor', 'subordinates', 'nextOfKin'])
+        $staff = Staff::with(['branch', 'supervisor', 'subordinates', 'nextOfKin', 'assignedProperties'])
             ->findOrFail($id);
 
         return view('staff_details.staff_details', compact('staff'));
@@ -119,7 +118,7 @@ class StaffController extends Controller
             'full_name' => $request->full_name,
             'relationship' => $request->relationship,
             'address' => $request->address,
-            'phone' => $request->phone
+            'phone' => $request->phone,
         ]);
 
         return redirect()

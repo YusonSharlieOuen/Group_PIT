@@ -114,6 +114,38 @@
             </div>
 
             <div class="bg-white p-6 shadow-sm sm:rounded-lg">
+                <h3 class="text-lg font-semibold text-gray-900">Assigned Responsibilities</h3>
+                <p class="mt-1 text-sm text-gray-600">Properties this staff member is responsible for.</p>
+
+                <div class="mt-5 overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Property</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Location</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Type</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            @forelse ($staff->assignedProperties as $property)
+                                <tr>
+                                    <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $property->property_id }}</td>
+                                    <td class="px-4 py-3 text-sm text-gray-700">{{ $property->street }}, {{ $property->area }}, {{ $property->city }}</td>
+                                    <td class="px-4 py-3 text-sm text-gray-700">{{ $property->property_type }}</td>
+                                    <td class="px-4 py-3 text-sm text-gray-700">{{ $property->status }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="px-4 py-8 text-center text-sm text-gray-500">No property responsibilities assigned.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 shadow-sm sm:rounded-lg">
                 <div class="flex items-center justify-between">
                     <h3 class="text-lg font-semibold text-gray-900">Next of Kin</h3>
                     @unless ($staff->nextOfKin)

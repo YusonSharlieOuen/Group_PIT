@@ -22,6 +22,6 @@ class Renter extends Model
         'max_rent',
         'comments',
         'branch_id',
-        'user_id'
+        'user_id',
     ];
 }

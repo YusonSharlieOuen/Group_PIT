@@ -27,6 +27,6 @@ class Lease extends Model
         'payment_method',
         'start_date',
         'end_date',
-        'duration'
+        'duration',
     ];
 }

@@ -23,7 +23,7 @@ class Branch extends Model
         'city',
         'postcode',
         'telephone',
-        'fax'
+        'fax',
     ];
 
     public function staff()
@@ -33,7 +33,7 @@ class Branch extends Model
 
     public function properties()
     {
-        return $this->hasMany(Property::class, 'branch_id', 'branch_id');
+        return $this->hasMany(PropertyDetails::class, 'branch_id', 'branch_id');
     }
 
     public function renters()

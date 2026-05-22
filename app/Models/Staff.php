@@ -30,7 +30,7 @@ class Staff extends Model
         'date_joined',
         'branch_id',
         'supervisor_id',
-        'user_id'
+        'user_id',
     ];
 
     public function user()
@@ -56,5 +56,10 @@ class Staff extends Model
     public function branch()
     {
         return $this->belongsTo(Branch::class, 'branch_id', 'branch_id');
+    }
+
+    public function assignedProperties()
+    {
+        return $this->hasMany(PropertyDetails::class, 'staff_id', 'staff_id');
     }
 }

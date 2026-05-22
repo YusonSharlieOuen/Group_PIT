@@ -31,7 +31,7 @@ class LeaseController extends Controller
 
         do {
 
-            $leaseId = 'L' . $number;
+            $leaseId = 'L'.$number;
 
             $exists = Lease::where('lease_id', $leaseId)->exists();
 
@@ -110,7 +110,7 @@ class LeaseController extends Controller
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
 
-            'duration' => round($duration)
+            'duration' => round($duration),
         ]);
 
         return back()->with(
@@ -122,10 +122,7 @@ class LeaseController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Lease $lease)
-    {
-        
-    }
+    public function show(Lease $lease) {}
 
     /**
      * Show the form for editing the specified resource.

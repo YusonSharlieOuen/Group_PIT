@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Viewing;
 use App\Models\PropertyDetails;
 use App\Models\Renter;
+use App\Models\Viewing;
 use Illuminate\Http\Request;
 
 class ViewingController extends Controller
@@ -40,14 +40,14 @@ class ViewingController extends Controller
             'property_id' => 'required',
             'renter_id' => 'required',
             'viewing_date' => 'required|date',
-            'comments' => 'nullable|string'
+            'comments' => 'nullable|string',
         ]);
 
         Viewing::create([
             'property_id' => $request->property_id,
             'renter_id' => $request->renter_id,
             'viewing_date' => $request->viewing_date,
-            'comments' => $request->comments
+            'comments' => $request->comments,
         ]);
 
         return back()->with('success', 'Viewing added successfully.');

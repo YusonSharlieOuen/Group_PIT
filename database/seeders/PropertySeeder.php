@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Property;
+use Illuminate\Database\Seeder;
 
 class PropertySeeder extends Seeder
 {
@@ -17,7 +17,7 @@ class PropertySeeder extends Seeder
             'baths' => 2,
             'sqft' => 2500,
             'type' => 'House',
-            'image_path' => 'properties/house1.jpg'
+            'image_path' => 'properties/house1.jpg',
         ]);
 
         Property::create([
@@ -28,9 +28,9 @@ class PropertySeeder extends Seeder
             'baths' => 2,
             'sqft' => 2200,
             'type' => 'House',
-            'image_path' => 'properties/house2.jpg'
+            'image_path' => 'properties/house2.jpg',
         ]);
-        
+
         // Add more here to match your Figma!
     }
 }

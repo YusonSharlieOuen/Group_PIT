@@ -17,6 +17,17 @@
                         {{ __('Profile') }}
                     </x-nav-link>
 
+<<<<<<< HEAD
+                    <x-nav-link :href="route('staff.index')" :active="request()->routeIs('staff.*')">
+                        {{ __('Staff') }}
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('branch.index')" :active="request()->routeIs('branch.*')">
+                        {{ __('Branches') }}
+                    </x-nav-link>
+
+=======
+>>>>>>> ed73b6f2432abfa87e9f7755bdde415cb6700b6e
                     <x-nav-link :href="route('home.find')" :active="request()->routeIs('home.find')">
                         {{ __('Find a Home') }}
                     </x-nav-link>
@@ -88,6 +99,15 @@
             <x-responsive-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')">
                 {{ __('Profile') }}
             </x-responsive-nav-link>
+<<<<<<< HEAD
+            <x-responsive-nav-link :href="route('staff.index')" :active="request()->routeIs('staff.*')">
+                {{ __('Staff') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('branch.index')" :active="request()->routeIs('branch.*')">
+                {{ __('Branches') }}
+            </x-responsive-nav-link>
+=======
+>>>>>>> ed73b6f2432abfa87e9f7755bdde415cb6700b6e
             <x-responsive-nav-link :href="route('home.find')" :active="request()->routeIs('home.find')">
                 {{ __('Find a Home') }}
             </x-responsive-nav-link>

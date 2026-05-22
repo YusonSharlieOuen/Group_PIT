@@ -16,15 +16,15 @@ class Viewing extends Model
         'renter_id',
         'property_id',
         'viewing_date',
-        'comments'
+        'comments',
     ];
 
     public function renter()
     {
         return $this->belongsTo(
-            \App\Models\Renter::class,
+            Renter::class,
             'renter_id',
             'renter_id'
-    );
-}
+        );
+    }
 }

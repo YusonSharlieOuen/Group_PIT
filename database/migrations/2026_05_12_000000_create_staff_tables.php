@@ -35,7 +35,7 @@ return new class extends Migration
             $table->string('position', 20);
             $table->decimal('salary', 10, 2)->nullable();
             $table->date('date_joined')->nullable();
-            
+
             $table->string('branch_id', 10)->nullable();
             $table->string('supervisor_id', 10)->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
