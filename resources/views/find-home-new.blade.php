@@ -288,6 +288,7 @@
                         </div>
                     </div>
 
+                    
                     <div class="property-card">
                         <img src="https://images.unsplash.com/photo-1572120471610-3b0f0f4ebd4f?auto=format&fit=crop&w=400&q=80" alt="Property" class="property-image">
                         <div class="property-details">

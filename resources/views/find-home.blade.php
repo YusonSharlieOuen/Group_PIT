@@ -48,20 +48,22 @@
                         @forelse(($properties ?? collect()) as $property)
                             <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden flex flex-col shadow-sm hover:shadow-md transition">
                                 <div class="h-48 w-full bg-gray-200">
-                                    <img src="{{ $property->image_path ? asset('storage/' . $property->image_path) : asset('images/house1.jpg') }}" class="w-full h-full object-cover" alt="{{ $property->title ?? 'Property' }}">
+                                    <img src="{{ asset('images/house1.jpg') }}" class="w-full h-full object-cover" alt="{{ $property->property_type ?? 'Property' }}">
                                 </div>
                                 <div class="p-4 flex flex-col flex-1">
-                                    <h3 class="font-bold text-gray-900 text-lg leading-tight mb-1">{{ $property->title ?? $property->address ?? 'Dream Home Property' }}</h3>
+                                    <h3 class="font-bold text-gray-900 text-lg leading-tight mb-1">
+                                        {{ $property->street }}, {{ $property->city }}
+                                    </h3>
                                     <div class="flex justify-between items-baseline mb-2">
-                                        <span class="text-gray-900 font-extrabold text-xl">PHP {{ number_format($property->price ?? 0) }}</span>
-                                        <span class="text-gray-800 font-bold text-sm">{{ $property->beds ?? 0 }} Bd, {{ $property->baths ?? 0 }} Ba</span>
+                                        <span class="text-gray-900 font-extrabold text-xl">PHP {{ number_format($property->monthly_rent ?? 0) }}</span>
+                                        <span class="text-gray-800 font-bold text-sm">{{ $property->number_of_rooms ?? 0 }} Rooms</span>
                                     </div>
                                     <p class="text-gray-600 text-xs mb-4 line-clamp-3 leading-relaxed flex-1">
-                                        {{ $property->description ?? 'A curated Dream Home listing ready for viewing.' }}
+                                        {{ $property->property_type }} in {{ $property->area }}, {{ $property->city }}. Postcode: {{ $property->postcode }}.
                                     </p>
                                     <div class="flex gap-2 mt-auto">
                                         <button class="flex-1 bg-[#e8e6df] text-gray-800 py-2.5 rounded-lg text-xs font-bold hover:bg-gray-300 transition">Save Property</button>
-                                        <button class="flex-1 bg-[#6caec1] text-white py-2.5 rounded-lg text-xs font-bold hover:bg-[#5a93a3] transition">View Details</button>
+                                        <a href="{{ route('property.show', $property->property_id) }}" class="flex-1 bg-[#6caec1] text-white py-2.5 rounded-lg text-xs font-bold hover:bg-[#5a93a3] transition text-center">View Details</a>
                                     </div>
                                 </div>
                             </div>

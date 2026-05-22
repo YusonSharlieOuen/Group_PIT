@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PropertyDetails;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; // We need this to talk directly to PostgreSQL
 
@@ -10,8 +11,23 @@ class PropertyController extends Controller
     // Your existing Find a Home function...
     public function index(Request $request)
     {
-        // Leaving this as-is for now!
-        return view('find-home');
+        $properties = PropertyDetails::where('status', 'Available')
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->search;
+
+                $query->where(function ($query) use ($search) {
+                    $query->where('street', 'like', "%{$search}%")
+                        ->orWhere('area', 'like', "%{$search}%")
+                        ->orWhere('city', 'like', "%{$search}%")
+                        ->orWhere('postcode', 'like', "%{$search}%");
+                });
+            })
+            ->when($request->filled('type'), function ($query) use ($request) {
+                $query->where('property_type', $request->type);
+            })
+            ->get();
+
+        return view('find-home', compact('properties'));
     }
 
     // THE MAGIC: Saving the List Your Property form
