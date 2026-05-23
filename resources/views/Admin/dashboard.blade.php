@@ -28,7 +28,6 @@
             <div class="mt-8 bg-white p-6 shadow sm:rounded-lg">
                 <h3 class="text-lg font-medium text-gray-900">Quick Actions</h3>
                 <div class="mt-4 flex gap-3">
-                    <a href="{{ route('staff.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded">Create Staff</a>
                     <a href="{{ route('property.create') }}" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded">Create Property</a>
                     <a href="{{ route('branch.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded">Branches</a>
                 </div>

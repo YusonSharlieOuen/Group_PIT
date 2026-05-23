@@ -17,7 +17,6 @@
                         {{ __('Profile') }}
                     </x-nav-link>
 
-<<<<<<< HEAD
                     <x-nav-link :href="route('staff.index')" :active="request()->routeIs('staff.*')">
                         {{ __('Staff') }}
                     </x-nav-link>
@@ -26,33 +25,33 @@
                         {{ __('Branches') }}
                     </x-nav-link>
 
-=======
->>>>>>> ed73b6f2432abfa87e9f7755bdde415cb6700b6e
                     @if(auth()->user()?->hasRole('Admin'))
                         <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin*')">
                             {{ __('Admin') }}
                         </x-nav-link>
                     @endif
 
-                    <x-nav-link :href="route('home.find')" :active="request()->routeIs('home.find')">
-                        {{ __('Find a Home') }}
-                    </x-nav-link>
+                    @unless(auth()->user()?->hasRole('Admin'))
+                        <x-nav-link :href="route('home.find')" :active="request()->routeIs('home.find')">
+                            {{ __('Find a Home') }}
+                        </x-nav-link>
 
-                    <x-nav-link :href="route('property.list')" :active="request()->routeIs('property.list')">
-                        {{ __('List Your Property') }}
-                    </x-nav-link>
+                        <x-nav-link :href="route('property.list')" :active="request()->routeIs('property.list')">
+                            {{ __('List Your Property') }}
+                        </x-nav-link>
 
-                    <x-nav-link :href="route('services')" :active="request()->routeIs('services')">
-                        {{ __('Services') }}
-                    </x-nav-link>
+                        <x-nav-link :href="route('services')" :active="request()->routeIs('services')">
+                            {{ __('Services') }}
+                        </x-nav-link>
 
-                    <x-nav-link :href="route('about')" :active="request()->routeIs('about')">
-                        {{ __('About Us') }}
-                    </x-nav-link>
+                        <x-nav-link :href="route('about')" :active="request()->routeIs('about')">
+                            {{ __('About Us') }}
+                        </x-nav-link>
 
-                    <x-nav-link :href="route('contact')" :active="request()->routeIs('contact')">
-                        {{ __('Contact') }}
-                    </x-nav-link>
+                        <x-nav-link :href="route('contact')" :active="request()->routeIs('contact')">
+                            {{ __('Contact') }}
+                        </x-nav-link>
+                    @endunless
                 </div>
             </div>
 
@@ -105,36 +104,35 @@
             <x-responsive-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')">
                 {{ __('Profile') }}
             </x-responsive-nav-link>
-<<<<<<< HEAD
             <x-responsive-nav-link :href="route('staff.index')" :active="request()->routeIs('staff.*')">
                 {{ __('Staff') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('branch.index')" :active="request()->routeIs('branch.*')">
                 {{ __('Branches') }}
             </x-responsive-nav-link>
-=======
->>>>>>> ed73b6f2432abfa87e9f7755bdde415cb6700b6e
             @if(auth()->user()?->hasRole('Admin'))
                 <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin*')">
                     {{ __('Admin') }}
                 </x-responsive-nav-link>
             @endif
 
-            <x-responsive-nav-link :href="route('home.find')" :active="request()->routeIs('home.find')">
-                {{ __('Find a Home') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('property.list')" :active="request()->routeIs('property.list')">
-                {{ __('List Your Property') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('services')" :active="request()->routeIs('services')">
-                {{ __('Services') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('about')" :active="request()->routeIs('about')">
-                {{ __('About Us') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('contact')" :active="request()->routeIs('contact')">
-                {{ __('Contact') }}
-            </x-responsive-nav-link>
+            @unless(auth()->user()?->hasRole('Admin'))
+                <x-responsive-nav-link :href="route('home.find')" :active="request()->routeIs('home.find')">
+                    {{ __('Find a Home') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('property.list')" :active="request()->routeIs('property.list')">
+                    {{ __('List Your Property') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('services')" :active="request()->routeIs('services')">
+                    {{ __('Services') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('about')" :active="request()->routeIs('about')">
+                    {{ __('About Us') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('contact')" :active="request()->routeIs('contact')">
+                    {{ __('Contact') }}
+                </x-responsive-nav-link>
+            @endunless
         </div>
 
         <div class="pt-4 pb-1 border-t border-gray-200">
