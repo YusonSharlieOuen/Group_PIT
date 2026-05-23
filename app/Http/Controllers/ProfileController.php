@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Renter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,8 +17,11 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $renter = Renter::where('user_id', $request->user()->id)->first();
+
         return view('profile.edit', [
             'user' => $request->user(),
+            'renter' => $renter,
         ]);
     }
 
@@ -26,15 +30,70 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        /*
+    UPDATE USER TABLE
+    */
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
+    $request->user()->fill($request->validated());
 
-        $request->user()->save();
+    if ($request->user()->isDirty('email')) {
+        $request->user()->email_verified_at = null;
+    }
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+    $request->user()->save();
+
+    /*
+    UPDATE OR CREATE RENTER
+    */
+
+    $renter = Renter::where('user_id', $request->user()->id)->first();
+
+    if (!$renter) {
+
+        /*
+        AUTO GENERATE RENTER ID
+        */
+
+        $number = 1;
+
+        do {
+
+            $renterId = 'R' . $number;
+
+            $exists = Renter::where('renter_id', $renterId)->exists();
+
+            $number++;
+
+        } while ($exists);
+
+        $renter = new Renter();
+
+        $renter->renter_id = $renterId;
+
+        $renter->user_id = $request->user()->id;
+
+        /*
+        TEMPORARY DEFAULT BRANCH
+        */
+
+        $renter->branch_id = 'B1';
+    }
+
+    /*
+    UPDATE RENTER FIELDS
+    */
+
+    $renter->first_name = $request->first_name;
+    $renter->last_name = $request->last_name;
+    $renter->address = $request->address;
+    $renter->phone = $request->phone;
+    $renter->preferred_property_type = $request->preferred_property_type;
+    $renter->max_rent = $request->max_rent;
+    $renter->comments = $request->comments;
+
+    $renter->save();
+
+    return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
     /**

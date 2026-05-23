@@ -12,7 +12,7 @@ class AdminController extends Controller
      */
     public function index()
     {
-        return view('Admin.admin_page');
+        return view('admin.index');
     }
 
     /**
@@ -28,7 +28,14 @@ class AdminController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        Staff::create([
+            'staff_id' => $request->input('staff_id'),
+            'first_name' => $request->input('first_name'),
+            'position' => $request->input('position'),
+            'branch_id' => $request->input('branch_id'),
+        ]);
+
+        return back();
     }
 
     /**

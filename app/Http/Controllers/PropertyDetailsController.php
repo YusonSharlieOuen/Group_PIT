@@ -117,11 +117,13 @@ class PropertyDetailsController extends Controller
         
         $viewings = Viewing::where('property_id', $id)->get();
 
+        $renters = Renter::all();
+
         // dd($property);
 
         return view(
             'Property.show_property',
-            compact('property', 'viewings')
+            compact('property', 'viewings', 'renters')
         );
         
 

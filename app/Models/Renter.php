@@ -8,6 +8,8 @@ class Renter extends Model
 {
     protected $table = 'renter';
 
+    protected $keyType = 'string';
+
     protected $primaryKey = 'renter_id';
 
     public $incrementing = false;

@@ -47,6 +47,105 @@
             @endif
         </div>
 
+        {{-- RENTER INFORMATION --}}
+
+<div>
+    <x-input-label for="first_name" :value="__('First Name')" />
+
+    <x-text-input
+        id="first_name"
+        name="first_name"
+        type="text"
+        class="mt-1 block w-full"
+        :value="old('first_name', $renter->first_name ?? '')"
+    />
+
+    <x-input-error class="mt-2" :messages="$errors->get('first_name')" />
+</div>
+
+<div>
+    <x-input-label for="last_name" :value="__('Last Name')" />
+
+    <x-text-input
+        id="last_name"
+        name="last_name"
+        type="text"
+        class="mt-1 block w-full"
+        :value="old('last_name', $renter->last_name ?? '')"
+    />
+
+    <x-input-error class="mt-2" :messages="$errors->get('last_name')" />
+</div>
+
+<div>
+    <x-input-label for="address" :value="__('Address')" />
+
+    <textarea
+        id="address"
+        name="address"
+        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+        rows="3"
+    >{{ old('address', $renter->address ?? '') }}</textarea>
+
+    <x-input-error class="mt-2" :messages="$errors->get('address')" />
+</div>
+
+<div>
+    <x-input-label for="phone" :value="__('Phone Number')" />
+
+    <x-text-input
+        id="phone"
+        name="phone"
+        type="text"
+        class="mt-1 block w-full"
+        :value="old('phone', $renter->phone ?? '')"
+    />
+
+    <x-input-error class="mt-2" :messages="$errors->get('phone')" />
+</div>
+
+<div>
+    <x-input-label for="preferred_property_type" :value="__('Preferred Property Type')" />
+
+    <x-text-input
+        id="preferred_property_type"
+        name="preferred_property_type"
+        type="text"
+        class="mt-1 block w-full"
+        :value="old('preferred_property_type', $renter->preferred_property_type ?? '')"
+    />
+
+    <x-input-error class="mt-2" :messages="$errors->get('preferred_property_type')" />
+</div>
+
+<div>
+    <x-input-label for="max_rent" :value="__('Maximum Rent Budget')" />
+
+    <x-text-input
+        id="max_rent"
+        name="max_rent"
+        type="number"
+        step="0.01"
+        class="mt-1 block w-full"
+        :value="old('max_rent', $renter->max_rent ?? '')"
+    />
+
+    <x-input-error class="mt-2" :messages="$errors->get('max_rent')" />
+</div>
+
+<div>
+    <x-input-label for="comments" :value="__('Comments')" />
+
+    <textarea
+        id="comments"
+        name="comments"
+        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+        rows="4"
+    >{{ old('comments', $renter->comments ?? '') }}</textarea>
+
+    <x-input-error class="mt-2" :messages="$errors->get('comments')" />
+</div>
+
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Save') }}</x-primary-button>
 
