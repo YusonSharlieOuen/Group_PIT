@@ -7,6 +7,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Staff;
 
 class User extends Authenticatable
 {
@@ -45,5 +46,38 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Relation to staff record (if any).
+     */
+    public function staff()
+    {
+        return $this->hasOne(Staff::class, 'user_id', 'id');
+    }
+
+    /**
+     * Check whether the user has one of the given positions/roles.
+     * Accepts a string (comma separated) or array of roles.
+     */
+    public function hasRole(array|string $roles): bool
+    {
+        $roles = is_array($roles) ? $roles : array_map('trim', explode(',', $roles));
+
+        $position = $this->staff?->position;
+
+        if (! $position) {
+            return false;
+        }
+
+        $position = strtolower($position);
+
+        foreach ($roles as $role) {
+            if ($position === strtolower(trim($role))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

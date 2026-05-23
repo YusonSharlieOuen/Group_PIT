@@ -28,6 +28,12 @@
 
 =======
 >>>>>>> ed73b6f2432abfa87e9f7755bdde415cb6700b6e
+                    @if(auth()->user()?->hasRole('Admin'))
+                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin*')">
+                            {{ __('Admin') }}
+                        </x-nav-link>
+                    @endif
+
                     <x-nav-link :href="route('home.find')" :active="request()->routeIs('home.find')">
                         {{ __('Find a Home') }}
                     </x-nav-link>
@@ -108,6 +114,12 @@
             </x-responsive-nav-link>
 =======
 >>>>>>> ed73b6f2432abfa87e9f7755bdde415cb6700b6e
+            @if(auth()->user()?->hasRole('Admin'))
+                <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin*')">
+                    {{ __('Admin') }}
+                </x-responsive-nav-link>
+            @endif
+
             <x-responsive-nav-link :href="route('home.find')" :active="request()->routeIs('home.find')">
                 {{ __('Find a Home') }}
             </x-responsive-nav-link>

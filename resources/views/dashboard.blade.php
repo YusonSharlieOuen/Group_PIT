@@ -76,47 +76,65 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-                <div class="bg-white p-6 border border-gray-100 rounded-xl shadow-sm group cursor-pointer hover:shadow-md transition">
-                    <div class="flex justify-between items-start mb-6">
-                        <img src="{{ asset('images/house1.jpg') }}"
-                             class="w-24 h-32 object-cover rounded group-hover:scale-105 transition duration-300"
-                             alt="Modern Minimalist Villa">
-                        <span class="text-xl font-light text-gray-900">PHP 45,000 / mo</span>
+                @if($featuredProperties->isNotEmpty())
+                    @foreach ($featuredProperties as $property)
+                        <a href="{{ route('property.show', $property->property_id) }}" class="bg-white p-6 border border-gray-100 rounded-xl shadow-sm group hover:shadow-md transition">
+                            <div class="flex justify-between items-start mb-6">
+                                <img src="{{ asset('images/house1.jpg') }}"
+                                     class="w-24 h-32 object-cover rounded group-hover:scale-105 transition duration-300"
+                                     alt="{{ $property->property_type }}">
+                                <span class="text-xl font-light text-gray-900">PHP {{ number_format($property->monthly_rent) }} / mo</span>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-serif font-bold text-gray-900">{{ ucfirst($property->property_type) }}</h4>
+                                <p class="text-gray-500 text-sm mb-4">{{ $property->number_of_rooms }} Bed - 1 Bath - {{ $property->area }}sqm</p>
+                                <span class="text-xs uppercase tracking-widest font-bold text-gray-400 group-hover:text-gray-900 transition">Details -></span>
+                            </div>
+                        </a>
+                    @endforeach
+                @else
+                    <div class="bg-white p-6 border border-gray-100 rounded-xl shadow-sm">
+                        <div class="flex justify-between items-start mb-6">
+                            <img src="{{ asset('images/house1.jpg') }}"
+                                 class="w-24 h-32 object-cover rounded transition duration-300"
+                                 alt="Modern Minimalist Villa">
+                            <span class="text-xl font-light text-gray-900">PHP 45,000 / mo</span>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-serif font-bold text-gray-900">Modern Minimalist Villa</h4>
+                            <p class="text-gray-500 text-sm mb-4">3 Bed - 2 Bath - 150sqm</p>
+                            <a href="{{ route('home.find') }}" class="text-xs uppercase tracking-widest font-bold text-gray-400 hover:text-gray-900 transition">View All Listings -></a>
+                        </div>
                     </div>
-                    <div>
-                        <h4 class="text-lg font-serif font-bold text-gray-900">Modern Minimalist Villa</h4>
-                        <p class="text-gray-500 text-sm mb-4">3 Bed - 2 Bath - 150sqm</p>
-                        <span class="text-xs uppercase tracking-widest font-bold text-gray-400 group-hover:text-gray-900 transition">Details -></span>
-                    </div>
-                </div>
 
-                <div class="bg-white p-6 border border-gray-100 rounded-xl shadow-sm group cursor-pointer hover:shadow-md transition">
-                    <div class="flex justify-between items-start mb-6">
-                        <img src="{{ asset('images/house2.jpg') }}"
-                             class="w-24 h-32 object-cover rounded group-hover:scale-105 transition duration-300"
-                             alt="Skyline Luxury Condo">
-                        <span class="text-xl font-light text-gray-900">PHP 32,000 / mo</span>
+                    <div class="bg-white p-6 border border-gray-100 rounded-xl shadow-sm">
+                        <div class="flex justify-between items-start mb-6">
+                            <img src="{{ asset('images/house2.jpg') }}"
+                                 class="w-24 h-32 object-cover rounded transition duration-300"
+                                 alt="Skyline Luxury Condo">
+                            <span class="text-xl font-light text-gray-900">PHP 32,000 / mo</span>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-serif font-bold text-gray-900">Skyline Luxury Condo</h4>
+                            <p class="text-gray-500 text-sm mb-4">2 Bed - 1 Bath - 85sqm</p>
+                            <a href="{{ route('home.find') }}" class="text-xs uppercase tracking-widest font-bold text-gray-400 hover:text-gray-900 transition">View All Listings -></a>
+                        </div>
                     </div>
-                    <div>
-                        <h4 class="text-lg font-serif font-bold text-gray-900">Skyline Luxury Condo</h4>
-                        <p class="text-gray-500 text-sm mb-4">2 Bed - 1 Bath - 85sqm</p>
-                        <span class="text-xs uppercase tracking-widest font-bold text-gray-400 group-hover:text-gray-900 transition">Details -></span>
-                    </div>
-                </div>
 
-                <div class="bg-white p-6 border border-gray-100 rounded-xl shadow-sm group cursor-pointer hover:shadow-md transition">
-                    <div class="flex justify-between items-start mb-6">
-                        <img src="{{ asset('images/photo4.jpg') }}"
-                             class="w-24 h-32 object-cover rounded group-hover:scale-105 transition duration-300"
-                             alt="Cozy Garden Terrace">
-                        <span class="text-xl font-light text-gray-900">PHP 60,000 / mo</span>
+                    <div class="bg-white p-6 border border-gray-100 rounded-xl shadow-sm">
+                        <div class="flex justify-between items-start mb-6">
+                            <img src="{{ asset('images/photo4.jpg') }}"
+                                 class="w-24 h-32 object-cover rounded transition duration-300"
+                                 alt="Cozy Garden Terrace">
+                            <span class="text-xl font-light text-gray-900">PHP 60,000 / mo</span>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-serif font-bold text-gray-900">Cozy Garden Terrace</h4>
+                            <p class="text-gray-500 text-sm mb-4">4 Bed - 3 Bath - 220sqm</p>
+                            <a href="{{ route('home.find') }}" class="text-xs uppercase tracking-widest font-bold text-gray-400 hover:text-gray-900 transition">View All Listings -></a>
+                        </div>
                     </div>
-                    <div>
-                        <h4 class="text-lg font-serif font-bold text-gray-900">Cozy Garden Terrace</h4>
-                        <p class="text-gray-500 text-sm mb-4">4 Bed - 3 Bath - 220sqm</p>
-                        <span class="text-xs uppercase tracking-widest font-bold text-gray-400 group-hover:text-gray-900 transition">Details -></span>
-                    </div>
-                </div>
+                @endif
             </div>
         </div>
     </div>

@@ -8,6 +8,7 @@ use App\Http\Controllers\PropertyDetailsController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\ViewingController;
+use App\Models\PropertyDetails;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -37,7 +38,9 @@ Route::get('/contact', function () {
 })->name('contact');
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $featuredProperties = PropertyDetails::take(3)->get();
+
+    return view('dashboard', compact('featuredProperties'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -48,35 +51,56 @@ Route::middleware('auth')->group(function () {
     Route::get('/user_profile', [UserProfileController::class, 'index'])->name('user_profile.index');
 
     Route::get('/staff', [StaffController::class, 'index'])
-        ->name('staff.index');
+        ->name('staff.index')
+        ->middleware(\App\Http\Middleware\RoleMiddleware::class.':Admin');
+
+    // Admin dashboard
+    Route::get('/admin', [\App\Http\Controllers\AdminController::class, 'index'])
+        ->name('admin.dashboard')
+        ->middleware(['auth', 'role:Admin']);
+
+    Route::get('/admin/staff', [\App\Http\Controllers\StaffController::class, 'index'])
+        ->name('admin.staff')
+        ->middleware(['auth', 'role:Admin']);
+
+    Route::get('/admin/reports', [\App\Http\Controllers\AdminController::class, 'reports'])
+        ->name('admin.reports')
+        ->middleware(['auth', 'role:Admin']);
 
     Route::resource('branch', BranchController::class);
 
     Route::get('/create_lease', [LeaseController::class, 'index'])->name('Lease.index');
 
     Route::get('/staff/create', [StaffController::class, 'create'])
-        ->name('staff.create');
+        ->name('staff.create')
+        ->middleware(\App\Http\Middleware\RoleMiddleware::class.':Admin');
 
     Route::post('/staff/store', [StaffController::class, 'store'])
-        ->name('staff.store');
+        ->name('staff.store')
+        ->middleware(\App\Http\Middleware\RoleMiddleware::class.':Admin');
 
     Route::get('/staff/{id}', [StaffController::class, 'show'])
         ->name('staff.show');
 
     Route::get('/staff/{id}/edit', [StaffController::class, 'edit'])
-        ->name('staff.edit');
+        ->name('staff.edit')
+        ->middleware(\App\Http\Middleware\RoleMiddleware::class.':Admin');
 
     Route::patch('/staff/{id}', [StaffController::class, 'update'])
-        ->name('staff.update');
+        ->name('staff.update')
+        ->middleware(\App\Http\Middleware\RoleMiddleware::class.':Admin');
 
     Route::delete('/staff/{id}', [StaffController::class, 'destroy'])
-        ->name('staff.destroy');
+        ->name('staff.destroy')
+        ->middleware(\App\Http\Middleware\RoleMiddleware::class.':Admin');
 
     Route::get('/staff/{id}/next-of-kin', [StaffController::class, 'createNextOfKin'])
-        ->name('staff.nextofkin.create');
+        ->name('staff.nextofkin.create')
+        ->middleware(\App\Http\Middleware\RoleMiddleware::class.':Admin');
 
     Route::post('/staff/{id}/next-of-kin', [StaffController::class, 'storeNextOfKin'])
-        ->name('staff.nextofkin.store');
+        ->name('staff.nextofkin.store')
+        ->middleware(\App\Http\Middleware\RoleMiddleware::class.':Admin');
 
     Route::get('/lease/create', [LeaseController::class, 'create'])
         ->name('lease.create');
@@ -88,7 +112,8 @@ Route::middleware('auth')->group(function () {
         ->name('property.index');
 
     Route::get('/property/create', [PropertyDetailsController::class, 'create'])
-        ->name('property.create');
+        ->name('property.create')
+        ->middleware(\App\Http\Middleware\RoleMiddleware::class.':Manager,Staff');
 
     Route::get('/property/{id}', [PropertyDetailsController::class, 'show'])
         ->name('property.show');

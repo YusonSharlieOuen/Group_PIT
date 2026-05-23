@@ -9,9 +9,11 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules;
 
 class StaffController extends Controller
 {
+    
     public function index()
     {
         $staffs = Staff::with(['branch', 'supervisor', 'nextOfKin'])
@@ -50,7 +52,7 @@ class StaffController extends Controller
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        if ($validated['email'] && empty($validated['password'])) {
+        if (! empty($validated['email']) && empty($validated['password'])) {
             return back()->withInput()->withErrors(['password' => 'Password is required when email is provided.']);
         }
 
