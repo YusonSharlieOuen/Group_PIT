@@ -48,6 +48,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/branch', [BranchController::class, 'index'])
         ->name('Branch.index');
+    Route::resource('branch', BranchController::class);
 
     Route::get('/create_lease', [LeaseController::class, 'index'])->name('Lease.index');
 

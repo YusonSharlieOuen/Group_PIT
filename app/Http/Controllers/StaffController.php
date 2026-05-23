@@ -76,7 +76,7 @@ class StaffController extends Controller
 
     public function show($id)
     {
-        $staff = Staff::with(['branch', 'supervisor', 'subordinates', 'nextOfKin'])
+        $staff = Staff::with(['branch', 'supervisor', 'subordinates', 'nextOfKin', 'assignedProperties'])
             ->findOrFail($id);
 
         return view('staff_details.staff_details', compact('staff'));
