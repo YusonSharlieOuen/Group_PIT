@@ -16,6 +16,12 @@
                 </p>
             </div>
 
+            @if($property->photo_path)
+                <img src="{{ asset('storage/'.$property->photo_path) }}"
+                     class="h-80 w-full object-cover"
+                     alt="Property {{ $property->property_id }}">
+            @endif
+
             <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700">
 
                 <div>

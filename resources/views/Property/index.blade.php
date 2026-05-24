@@ -40,10 +40,14 @@
                     <div class="bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-lg transition overflow-hidden">
 
                         <!-- TOP SECTION -->
-                        <div class="h-40 bg-gradient-to-br from-[#5c9aa9] to-[#6caec1] flex items-center justify-center">
-                            <span class="text-white font-bold text-xl tracking-wide">
-                                {{ $property->property_id }}
-                            </span>
+                        <div class="h-40 bg-gradient-to-br from-[#5c9aa9] to-[#6caec1] flex items-center justify-center overflow-hidden">
+                            @if($property->photo_path)
+                                <img src="{{ asset('storage/'.$property->photo_path) }}" class="h-full w-full object-cover" alt="{{ $property->property_id }}">
+                            @else
+                                <span class="text-white font-bold text-xl tracking-wide">
+                                    {{ $property->property_id }}
+                                </span>
+                            @endif
                         </div>
 
                         <!-- CONTENT -->

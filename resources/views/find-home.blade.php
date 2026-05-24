@@ -10,6 +10,12 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="relative z-20 -mt-8 mb-4 max-w-4xl mx-auto">
                 <form action="{{ route('home.find') }}" method="GET" class="bg-white rounded-xl shadow-lg border border-gray-200 p-1.5 flex items-center">
+                    @if(request('type'))
+                        <input type="hidden" name="type" value="{{ request('type') }}">
+                    @endif
+                    @if(request('branch_id'))
+                        <input type="hidden" name="branch_id" value="{{ request('branch_id') }}">
+                    @endif
                     <svg class="h-6 w-6 text-gray-400 ml-3 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                     </svg>
@@ -22,11 +28,24 @@
                 </form>
             </div>
 
-            <div class="flex flex-wrap justify-center gap-3 mb-10 max-w-5xl mx-auto">
+            <form action="{{ route('home.find') }}" method="GET" class="flex flex-wrap justify-center gap-3 mb-10 max-w-5xl mx-auto">
+                @if(request('search'))
+                    <input type="hidden" name="search" value="{{ request('search') }}">
+                @endif
+
                 <select name="type" class="bg-gray-50 border border-gray-200 text-gray-700 py-2 px-4 rounded-md text-sm focus:ring-[#5c9aa9] focus:border-[#5c9aa9] shadow-sm font-medium cursor-pointer">
                     <option value="">Property Type</option>
                     <option value="House" {{ request('type') == 'House' ? 'selected' : '' }}>House</option>
                     <option value="Condo" {{ request('type') == 'Condo' ? 'selected' : '' }}>Condo</option>
+                </select>
+
+                <select name="branch_id" class="bg-gray-50 border border-gray-200 text-gray-700 py-2 px-4 rounded-md text-sm focus:ring-[#5c9aa9] focus:border-[#5c9aa9] shadow-sm font-medium cursor-pointer">
+                    <option value="">All Branches</option>
+                    @foreach(($branches ?? collect()) as $branch)
+                        <option value="{{ $branch->branch_id }}" {{ request('branch_id') == $branch->branch_id ? 'selected' : '' }}>
+                            {{ $branch->branch_id }} - {{ $branch->city ?? $branch->area ?? 'Branch' }}
+                        </option>
+                    @endforeach
                 </select>
 
                 <select class="bg-gray-50 border border-gray-200 text-gray-700 py-2 px-4 rounded-md text-sm focus:ring-[#5c9aa9] focus:border-[#5c9aa9] shadow-sm font-medium cursor-pointer">
@@ -40,7 +59,17 @@
                 <select class="bg-gray-50 border border-gray-200 text-gray-700 py-2 px-4 rounded-md text-sm focus:ring-[#5c9aa9] focus:border-[#5c9aa9] shadow-sm font-medium cursor-pointer">
                     <option value="">Square Feet</option>
                 </select>
-            </div>
+
+                <button type="submit" class="bg-[#5c9aa9] text-white py-2 px-5 rounded-md text-sm font-bold hover:bg-[#4a8291] transition shadow-sm">
+                    Apply Filters
+                </button>
+
+                @if(request()->hasAny(['search', 'type', 'branch_id']))
+                    <a href="{{ route('home.find') }}" class="bg-gray-100 border border-gray-200 text-gray-700 py-2 px-5 rounded-md text-sm font-bold hover:bg-gray-200 transition shadow-sm">
+                        Clear
+                    </a>
+                @endif
+            </form>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <div class="lg:col-span-7">
@@ -48,7 +77,7 @@
                         @forelse(($properties ?? collect()) as $property)
                             <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden flex flex-col shadow-sm hover:shadow-md transition">
                                 <div class="h-48 w-full bg-gray-200">
-                                    <img src="{{ asset('images/house1.jpg') }}" class="w-full h-full object-cover" alt="{{ $property->property_type ?? 'Property' }}">
+                                    <img src="{{ $property->photo_path ? asset('storage/'.$property->photo_path) : asset('images/house1.jpg') }}" class="w-full h-full object-cover" alt="{{ $property->property_type ?? 'Property' }}">
                                 </div>
                                 <div class="p-4 flex flex-col flex-1">
                                     <h3 class="font-bold text-gray-900 text-lg leading-tight mb-1">
@@ -61,6 +90,12 @@
                                     <p class="text-gray-600 text-xs mb-4 line-clamp-3 leading-relaxed flex-1">
                                         {{ $property->property_type }} in {{ $property->area }}, {{ $property->city }}. Postcode: {{ $property->postcode }}.
                                     </p>
+                                    <p class="text-gray-500 text-xs mb-4">
+                                        Branch: {{ $property->branch?->branch_id ?? 'N/A' }}
+                                        @if($property->branch)
+                                            - {{ $property->branch->city ?? $property->branch->area ?? 'No location set' }}
+                                        @endif
+                                    </p>
                                     <div class="flex gap-2 mt-auto">
                                         <button class="flex-1 bg-[#e8e6df] text-gray-800 py-2.5 rounded-lg text-xs font-bold hover:bg-gray-300 transition">Save Property</button>
                                         <a href="{{ route('property.show', $property->property_id) }}" class="flex-1 bg-[#6caec1] text-white py-2.5 rounded-lg text-xs font-bold hover:bg-[#5a93a3] transition text-center">View Details</a>
@@ -68,44 +103,20 @@
                                 </div>
                             </div>
                         @empty
-                            <div class="bg-white rounded-2xl border-2 border-[#5c9aa9] overflow-hidden flex flex-col shadow-md">
-                                <div class="h-48 w-full bg-gray-200">
-                                    <img src="{{ asset('images/house1.jpg') }}" class="w-full h-full object-cover" alt="Villa">
-                                </div>
-                                <div class="p-4 flex flex-col flex-1">
-                                    <h3 class="font-bold text-gray-900 text-lg leading-tight mb-1">Address Villa, Manila</h3>
-                                    <div class="flex justify-between items-baseline mb-2">
-                                        <span class="text-gray-900 font-extrabold text-xl">PHP 850,000</span>
-                                        <span class="text-gray-800 font-bold text-sm">3 Bd, 2 Ba</span>
-                                    </div>
-                                    <p class="text-gray-600 text-xs mb-4 line-clamp-3 leading-relaxed flex-1">
-                                        A modern piece of architecture right on the beachfront with complete home amenities.
-                                    </p>
-                                    <div class="flex gap-2 mt-auto">
-                                        <button class="flex-1 bg-[#e8e6df] text-gray-800 py-2.5 rounded-lg text-xs font-bold hover:bg-gray-300 transition">Save Property</button>
-                                        <button class="flex-1 bg-[#6caec1] text-white py-2.5 rounded-lg text-xs font-bold hover:bg-[#5a93a3] transition">View Details</button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden flex flex-col shadow-sm hover:shadow-md transition">
-                                <div class="h-48 w-full bg-gray-200">
-                                    <img src="{{ asset('images/house2.jpg') }}" class="w-full h-full object-cover" alt="Brick Home">
-                                </div>
-                                <div class="p-4 flex flex-col flex-1">
-                                    <h3 class="font-bold text-gray-900 text-lg leading-tight mb-1">Address Brick Home</h3>
-                                    <div class="flex justify-between items-baseline mb-2">
-                                        <span class="text-gray-900 font-extrabold text-xl">PHP 750,000</span>
-                                        <span class="text-gray-800 font-bold text-sm">3 Bd, 2 Ba</span>
-                                    </div>
-                                    <p class="text-gray-600 text-xs mb-4 line-clamp-3 leading-relaxed flex-1">
-                                        Traditional brick home fit for a family seeking comfort and stability.
-                                    </p>
-                                    <div class="flex gap-2 mt-auto">
-                                        <button class="flex-1 bg-[#e8e6df] text-gray-800 py-2.5 rounded-lg text-xs font-bold hover:bg-gray-300 transition">Save Property</button>
-                                        <button class="flex-1 bg-[#6caec1] text-white py-2.5 rounded-lg text-xs font-bold hover:bg-[#5a93a3] transition">View Details</button>
-                                    </div>
-                                </div>
+                            <div class="sm:col-span-2 rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
+                                <h3 class="text-lg font-bold text-gray-900">No listings found</h3>
+                                <p class="mt-2 text-sm text-gray-600">
+                                    @if(request('branch_id'))
+                                        This branch has no available properties yet. Create a property and assign it to branch {{ request('branch_id') }}.
+                                    @else
+                                        There are no available properties matching the selected filters.
+                                    @endif
+                                </p>
+                                @auth
+                                    <a href="{{ route('property.create') }}" class="mt-5 inline-flex rounded-md bg-[#5c9aa9] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#4a8291]">
+                                        Create Property
+                                    </a>
+                                @endauth
                             </div>
                         @endforelse
                     </div>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Branch;
 use App\Models\PropertyDetails;
+use App\Models\Renter;
 use App\Models\Staff;
 use App\Models\Viewing;
 use Illuminate\Http\Request;
@@ -81,9 +82,14 @@ class PropertyDetailsController extends Controller
             'property_type' => 'required',
             'number_of_rooms' => 'required|integer',
             'monthly_rent' => 'required|numeric',
+            'photo' => 'nullable|image|max:4096',
             'branch_id' => 'nullable|exists:branch,branch_id',
             'staff_id' => 'nullable|exists:staff,staff_id',
         ]);
+
+        $photoPath = $request->hasFile('photo')
+            ? $request->file('photo')->store('property-photos', 'public')
+            : null;
 
         PropertyDetails::create([
             'property_id' => $request->property_id,
@@ -95,6 +101,7 @@ class PropertyDetailsController extends Controller
             'number_of_rooms' => $request->number_of_rooms,
             'monthly_rent' => $request->monthly_rent,
             'status' => 'Available',
+            'photo_path' => $photoPath,
             'branch_id' => $request->branch_id ?? null,
             'staff_id' => $request->staff_id ?? null,
         ]);

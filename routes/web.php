@@ -123,7 +123,11 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/property/create', [PropertyDetailsController::class, 'create'])
         ->name('property.create')
-        ->middleware(\App\Http\Middleware\RoleMiddleware::class.':Manager,Staff');
+        ->middleware(\App\Http\Middleware\RoleMiddleware::class.':Admin,Manager,Staff');
+
+    Route::post('/property/details/store', [PropertyDetailsController::class, 'store'])
+        ->name('property.details.store')
+        ->middleware(\App\Http\Middleware\RoleMiddleware::class.':Admin,Manager,Staff');
 
     Route::get('/property/{id}', [PropertyDetailsController::class, 'show'])
         ->name('property.show');

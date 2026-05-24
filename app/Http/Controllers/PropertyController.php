@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Branch;
 use App\Models\PropertyDetails;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; // We need this to talk directly to PostgreSQL
@@ -11,7 +12,10 @@ class PropertyController extends Controller
     // Your existing Find a Home function...
     public function index(Request $request)
     {
-        $properties = PropertyDetails::where('status', 'Available')
+        $branches = Branch::orderBy('branch_id')->get();
+
+        $properties = PropertyDetails::with('branch')
+            ->where('status', 'Available')
             ->when($request->filled('search'), function ($query) use ($request) {
                 $search = $request->search;
 
@@ -25,9 +29,12 @@ class PropertyController extends Controller
             ->when($request->filled('type'), function ($query) use ($request) {
                 $query->where('property_type', $request->type);
             })
+            ->when($request->filled('branch_id'), function ($query) use ($request) {
+                $query->where('branch_id', $request->branch_id);
+            })
             ->get();
 
-        return view('find-home', compact('properties'));
+        return view('find-home', compact('properties', 'branches'));
     }
 
     // THE MAGIC: Saving the List Your Property form

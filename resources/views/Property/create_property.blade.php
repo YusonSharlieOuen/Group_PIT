@@ -8,7 +8,7 @@
     </ul>
 @endif
 
-<form action="{{ route('property.store') }}" method="POST">
+<form action="{{ route('property.details.store') }}" method="POST" enctype="multipart/form-data">
     @csrf
 
     <input type="text" name="property_id" value="{{ $propertyId }}" readonly>
@@ -26,6 +26,9 @@
     <input type="number" name="number_of_rooms" placeholder="Number of Rooms">
 
     <input type="number" step="0.01" name="monthly_rent" placeholder="Monthly Rent">
+
+    <label>Property Photo</label>
+    <input type="file" name="photo" accept="image/*">
 
     <label>Branch</label>
 
