@@ -1,0 +1,5 @@
+- [x] Update create property GUI in resources/views/Property/create_property.blade.php to use <x-app-layout> and Tailwind admin styling
+- [x] Preserve existing form fields and route/action + CSRF + enctype
+- [x] Preserve branch -> staff AJAX dropdown behavior
+- [x] Verify validation error display matches existing $errors usage
+- [x] Smoke test: open /admin and click Create Property; ensure form renders and submitting hits property.details.store

@@ -2,16 +2,17 @@
     $navItems = [
         ['label' => 'Dashboard', 'route' => 'dashboard', 'active' => request()->routeIs('dashboard')],
         ['label' => 'Profile', 'route' => 'profile.edit', 'active' => request()->routeIs('profile.edit')],
-        ['label' => 'Staff', 'route' => 'staff.index', 'active' => request()->routeIs('staff.*')],
-        ['label' => 'Branches', 'route' => 'branch.index', 'active' => request()->routeIs('branch.*')],
     ];
 
     if (auth()->user()?->hasRole('Admin')) {
-        $navItems[] = ['label' => 'Admin', 'route' => 'admin.dashboard', 'active' => request()->routeIs('admin*')];
+        $navItems = array_merge($navItems, [
+            ['label' => 'Staff', 'route' => 'staff.index', 'active' => request()->routeIs('staff.*')],
+            ['label' => 'Branches', 'route' => 'branch.index', 'active' => request()->routeIs('branch.*')],
+            ['label' => 'Admin', 'route' => 'admin.dashboard', 'active' => request()->routeIs('admin*')],
+        ]);
     } else {
         $navItems = array_merge($navItems, [
             ['label' => 'Find a Home', 'route' => 'home.find', 'active' => request()->routeIs('home.find')],
-            ['label' => 'List Your Property', 'route' => 'property.list', 'active' => request()->routeIs('property.list')],
             ['label' => 'Services', 'route' => 'services', 'active' => request()->routeIs('services')],
             ['label' => 'About Us', 'route' => 'about', 'active' => request()->routeIs('about')],
             ['label' => 'Contact', 'route' => 'contact', 'active' => request()->routeIs('contact')],
