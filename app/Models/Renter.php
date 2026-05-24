@@ -8,9 +8,13 @@ class Renter extends Model
 {
     protected $table = 'renter';
 
+    protected $keyType = 'string';
+
     protected $primaryKey = 'renter_id';
 
     public $incrementing = false;
+
+    public $timestamps = false;
 
     protected $fillable = [
         'renter_id',

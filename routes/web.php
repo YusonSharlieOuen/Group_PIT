@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\LeaseController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PropertyDetailsController;
@@ -67,10 +69,13 @@ Route::middleware('auth')->group(function () {
         ->name('admin.reports')
         ->middleware(['auth', 'role:Admin']);
 
+    Route::get('/branch', [BranchController::class, 'index'])
+        ->name('Branch.index');
     Route::resource('branch', BranchController::class);
 
     Route::get('/create_lease', [LeaseController::class, 'index'])->name('Lease.index');
 
+    // Staff Routes
     Route::get('/staff/create', [StaffController::class, 'create'])
         ->name('staff.create')
         ->middleware(\App\Http\Middleware\RoleMiddleware::class.':Admin');
@@ -102,12 +107,17 @@ Route::middleware('auth')->group(function () {
         ->name('staff.nextofkin.store')
         ->middleware(\App\Http\Middleware\RoleMiddleware::class.':Admin');
 
+    // Lease Routes
+    Route::get('/leases', [LeaseController::class, 'display_all_leases'])
+        ->name('lease.all');
+
     Route::get('/lease/create', [LeaseController::class, 'create'])
         ->name('lease.create');
 
     Route::post('/lease/store', [LeaseController::class, 'store'])
         ->name('lease.store');
 
+    // Property Details Routes
     Route::get('/property', [PropertyDetailsController::class, 'index'])
         ->name('property.index');
 
@@ -120,11 +130,24 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/get-staff/{branch_id}', [PropertyDetailsController::class, 'getStaffByBranch']);
 
+    // Viewing Routes
     Route::get('/viewing/create', [ViewingController::class, 'create'])
         ->name('viewing.create');
 
     Route::post('/viewing/store', [ViewingController::class, 'store'])
         ->name('viewing.store');
+
+    // Manager Routes
+    Route::get('/manager/create-staff', [ManagerController::class, 'create'])
+        ->name('manager.create');
+    Route::post('/manager/create-staff', [ManagerController::class, 'store'])
+        ->name('manager.store');
+
+    // Admin Routes
+    Route::get('/admin/create-staff', [AdminController::class, 'create'])
+        ->name('admin.index');
+    Route::post('/admin/create-staff', [AdminController::class, 'store'])
+        ->name('admin.store');
 });
 
 require __DIR__.'/auth.php';

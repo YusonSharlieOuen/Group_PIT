@@ -27,15 +27,114 @@
 
                 <div>
                     <p><strong>Monthly Rent:</strong> ₱{{ number_format($property->monthly_rent) }}</p>
-                    <p><strong>Status:</strong>
+
+                    <p class="mt-2">
+                        <strong>Status:</strong>
+
                         <span class="px-3 py-1 rounded-full text-white text-sm
-                            {{ $property->status == 'Available' ? 'bg-green-500' : 'bg-red-500' }}">
+                            {{ $property->status == 'Available'
+                                ? 'bg-green-500'
+                                : 'bg-red-500' }}">
+
                             {{ $property->status }}
+
                         </span>
                     </p>
                 </div>
 
             </div>
+
+        </div>
+
+        <!-- CREATE VIEWING -->
+        <div class="mt-10 bg-white border border-gray-200 rounded-2xl shadow-md p-6">
+
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                Create Viewing
+            </h2>
+
+            <form action="{{ route('viewing.store') }}" method="POST">
+
+                @csrf
+
+                <!-- hidden property id -->
+                <input
+                    type="hidden"
+                    name="property_id"
+                    value="{{ $property->property_id }}"
+                >
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <!-- RENTER -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Renter
+                        </label>
+
+                        <select
+                            name="renter_id"
+                            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-[#5c9aa9] focus:border-[#5c9aa9]"
+                            required
+                        >
+
+                            <option value="">Select Renter</option>
+
+                            @foreach($renters as $renter)
+
+                                <option value="{{ $renter->renter_id }}">
+                                    {{ $renter->first_name }}
+                                    {{ $renter->last_name }}
+                                    ({{ $renter->renter_id }})
+                                </option>
+
+                            @endforeach
+
+                        </select>
+                    </div>
+
+                    <!-- DATE -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Viewing Date
+                        </label>
+
+                        <input
+                            type="date"
+                            name="viewing_date"
+                            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-[#5c9aa9] focus:border-[#5c9aa9]"
+                            required
+                        >
+                    </div>
+
+                </div>
+
+                <!-- COMMENTS -->
+                <div class="mt-6">
+
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Comments
+                    </label>
+
+                    <textarea
+                        name="comments"
+                        rows="4"
+                        class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-[#5c9aa9] focus:border-[#5c9aa9]"
+                        placeholder="Enter comments..."
+                    ></textarea>
+
+                </div>
+
+                <div class="mt-6">
+                    <button
+                        type="submit"
+                        class="bg-[#5c9aa9] hover:bg-[#4a8796] text-white font-semibold px-6 py-3 rounded-xl transition"
+                    >
+                        Create Viewing
+                    </button>
+                </div>
+
+            </form>
 
         </div>
 
@@ -61,6 +160,7 @@
                             <p class="font-semibold text-gray-800">
                                 {{ $viewing->renter->first_name }}
                                 {{ $viewing->renter->last_name }}
+
                                 <span class="text-gray-500 font-normal">
                                     ({{ $viewing->renter_id }})
                                 </span>
@@ -88,4 +188,4 @@
 
 </div>
 
-</x-app-layout>
+</x-app-layout> 

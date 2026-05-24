@@ -68,9 +68,9 @@ class LeaseController extends Controller
         $request->validate([
             'lease_id' => 'required|unique:lease,lease_id',
 
-            'property_id' => 'required',
-            'renter_id' => 'required',
-            'staff_id' => 'required',
+            'property_id' => 'required|exists:property_details,property_id',
+            'renter_id' => 'required|exists:renter,renter_id',
+            'staff_id' => 'required|exists:staff,staff_id',
 
             'rent' => 'required|numeric',
             'deposit' => 'required|numeric',
@@ -117,6 +117,13 @@ class LeaseController extends Controller
             'success',
             'Lease created successfully.'
         );
+    }
+
+    public function display_all_leases()
+    {
+        $leases = Lease::with(['property', 'renter', 'staff'])->get();
+
+        return view('Lease.display_all_lease', compact('leases'));
     }
 
     /**

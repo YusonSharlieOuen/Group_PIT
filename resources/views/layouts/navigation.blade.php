@@ -1,155 +1,132 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex">
-                <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
-                    </a>
-                </div>
+@php
+    $navItems = [
+        ['label' => 'Dashboard', 'route' => 'dashboard', 'active' => request()->routeIs('dashboard')],
+        ['label' => 'Profile', 'route' => 'profile.edit', 'active' => request()->routeIs('profile.edit')],
+        ['label' => 'Staff', 'route' => 'staff.index', 'active' => request()->routeIs('staff.*')],
+        ['label' => 'Branches', 'route' => 'branch.index', 'active' => request()->routeIs('branch.*')],
+    ];
 
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
+    if (auth()->user()?->hasRole('Admin')) {
+        $navItems[] = ['label' => 'Admin', 'route' => 'admin.dashboard', 'active' => request()->routeIs('admin*')];
+    } else {
+        $navItems = array_merge($navItems, [
+            ['label' => 'Find a Home', 'route' => 'home.find', 'active' => request()->routeIs('home.find')],
+            ['label' => 'List Your Property', 'route' => 'property.list', 'active' => request()->routeIs('property.list')],
+            ['label' => 'Services', 'route' => 'services', 'active' => request()->routeIs('services')],
+            ['label' => 'About Us', 'route' => 'about', 'active' => request()->routeIs('about')],
+            ['label' => 'Contact', 'route' => 'contact', 'active' => request()->routeIs('contact')],
+        ]);
+    }
+@endphp
 
-                    <x-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')">
-                        {{ __('Profile') }}
-                    </x-nav-link>
+<button
+    type="button"
+    class="fixed left-4 top-4 z-50 inline-flex h-10 w-10 items-center justify-center rounded-md border border-gray-200 bg-white text-gray-600 shadow-sm transition hover:bg-gray-50 lg:hidden"
+    @click="sidebarOpen = ! sidebarOpen"
+    aria-label="Toggle navigation"
+>
+    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+    </svg>
+</button>
 
-                    <x-nav-link :href="route('staff.index')" :active="request()->routeIs('staff.*')">
-                        {{ __('Staff') }}
-                    </x-nav-link>
+<div
+    x-show="sidebarOpen"
+    x-transition.opacity
+    class="fixed inset-0 z-30 bg-gray-950/30 lg:hidden"
+    @click="sidebarOpen = false"
+></div>
 
-                    <x-nav-link :href="route('branch.index')" :active="request()->routeIs('branch.*')">
-                        {{ __('Branches') }}
-                    </x-nav-link>
+<aside
+    class="fixed inset-y-0 left-0 z-40 flex flex-col border-r border-gray-200 bg-white shadow-sm transition-all duration-300"
+    :class="[
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
+        sidebarOpen ? 'w-64' : 'lg:w-20'
+    ]"
+>
+    <div class="flex h-16 items-center gap-3 border-b border-gray-100 px-4" :class="sidebarOpen ? 'justify-between' : 'justify-center'">
+        <a href="{{ route('dashboard') }}" class="flex items-center gap-3 overflow-hidden">
+            <x-application-logo class="h-9 w-auto shrink-0 fill-current text-gray-800" />
+            <span x-show="sidebarOpen" x-cloak class="whitespace-nowrap font-serif text-lg font-semibold tracking-widest text-gray-950">
+                DREAM
+            </span>
+        </a>
 
-                    @if(auth()->user()?->hasRole('Admin'))
-                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin*')">
-                            {{ __('Admin') }}
-                        </x-nav-link>
-                    @endif
-
-                    @unless(auth()->user()?->hasRole('Admin'))
-                        <x-nav-link :href="route('home.find')" :active="request()->routeIs('home.find')">
-                            {{ __('Find a Home') }}
-                        </x-nav-link>
-
-                        <x-nav-link :href="route('property.list')" :active="request()->routeIs('property.list')">
-                            {{ __('List Your Property') }}
-                        </x-nav-link>
-
-                        <x-nav-link :href="route('services')" :active="request()->routeIs('services')">
-                            {{ __('Services') }}
-                        </x-nav-link>
-
-                        <x-nav-link :href="route('about')" :active="request()->routeIs('about')">
-                            {{ __('About Us') }}
-                        </x-nav-link>
-
-                        <x-nav-link :href="route('contact')" :active="request()->routeIs('contact')">
-                            {{ __('Contact') }}
-                        </x-nav-link>
-                    @endunless
-                </div>
-            </div>
-
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ Auth::user()->name }}</div>
-
-                            <div class="ms-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                        </button>
-                    </x-slot>
-
-                    <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
-                        </x-dropdown-link>
-
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault(); this.closest('form').submit();">
-                                {{ __('Log Out') }}
-                            </x-dropdown-link>
-                        </form>
-                    </x-slot>
-                </x-dropdown>
-            </div>
-
-            <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
-                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-        </div>
+        <button
+            type="button"
+            class="hidden h-9 w-9 shrink-0 items-center justify-center rounded-md text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 lg:inline-flex"
+            @click="sidebarOpen = ! sidebarOpen"
+            aria-label="Toggle sidebar"
+        >
+            <svg x-show="sidebarOpen" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            <svg x-show="! sidebarOpen" x-cloak class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </button>
     </div>
 
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')">
-                {{ __('Profile') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('staff.index')" :active="request()->routeIs('staff.*')">
-                {{ __('Staff') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('branch.index')" :active="request()->routeIs('branch.*')">
-                {{ __('Branches') }}
-            </x-responsive-nav-link>
-            @if(auth()->user()?->hasRole('Admin'))
-                <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin*')">
-                    {{ __('Admin') }}
-                </x-responsive-nav-link>
+    <div class="border-b border-gray-100 px-4 py-5">
+        <div class="mb-4 flex items-center" :class="sidebarOpen ? 'justify-start gap-3' : 'justify-center'">
+            @if (Auth::user()->profile_photo_path)
+                <img src="{{ asset('storage/'.Auth::user()->profile_photo_path) }}"
+                     class="h-12 w-12 rounded-full border-2 border-white object-cover shadow-sm"
+                     alt="{{ Auth::user()->name }}">
+            @else
+                <div class="flex h-12 w-12 items-center justify-center rounded-full border-2 border-white bg-gray-100 text-sm font-bold text-gray-700 shadow-sm">
+                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                </div>
             @endif
 
-            @unless(auth()->user()?->hasRole('Admin'))
-                <x-responsive-nav-link :href="route('home.find')" :active="request()->routeIs('home.find')">
-                    {{ __('Find a Home') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('property.list')" :active="request()->routeIs('property.list')">
-                    {{ __('List Your Property') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('services')" :active="request()->routeIs('services')">
-                    {{ __('Services') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('about')" :active="request()->routeIs('about')">
-                    {{ __('About Us') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('contact')" :active="request()->routeIs('contact')">
-                    {{ __('Contact') }}
-                </x-responsive-nav-link>
-            @endunless
+            <div x-show="sidebarOpen" x-cloak class="min-w-0">
+                <p class="truncate text-sm font-semibold text-gray-900">{{ Auth::user()->name }}</p>
+                <p class="truncate text-xs text-gray-500">{{ Auth::user()->email }}</p>
+            </div>
         </div>
 
-        <div class="pt-4 pb-1 border-t border-gray-200">
-            <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
-            </div>
+        <x-dropdown align="left" width="48">
+            <x-slot name="trigger">
+                <button class="flex w-full items-center rounded-md text-left text-sm font-medium text-gray-600 transition hover:text-gray-900" :class="sidebarOpen ? 'justify-between' : 'justify-center'">
+                    <span x-show="sidebarOpen" x-cloak class="truncate">Account Options</span>
+                    <span x-show="! sidebarOpen" x-cloak class="text-xs font-semibold">...</span>
+                    <svg x-show="sidebarOpen" x-cloak class="h-4 w-4 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </x-slot>
 
-            <div class="mt-3 space-y-1">
+            <x-slot name="content">
+                <x-dropdown-link :href="route('profile.edit')">
+                    {{ __('Profile') }}
+                </x-dropdown-link>
+
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <x-responsive-nav-link :href="route('logout')"
+                    <x-dropdown-link :href="route('logout')"
                             onclick="event.preventDefault(); this.closest('form').submit();">
                         {{ __('Log Out') }}
-                    </x-responsive-nav-link>
+                    </x-dropdown-link>
                 </form>
-            </div>
-        </div>
+            </x-slot>
+        </x-dropdown>
     </div>
-</nav>
+
+    <nav class="flex-1 space-y-1 px-3 py-5">
+        @foreach ($navItems as $item)
+            <a href="{{ route($item['route']) }}"
+               class="group flex items-center rounded-md px-3 py-2 text-sm font-medium transition"
+               :class="sidebarOpen ? 'justify-start' : 'justify-center'"
+               title="{{ $item['label'] }}"
+            >
+                <span class="{{ $item['active'] ? 'border-indigo-500 text-gray-950' : 'border-transparent text-gray-600 group-hover:text-gray-950' }} flex w-full items-center border-b-2 pb-2 transition"
+                      :class="sidebarOpen ? 'justify-start' : 'justify-center'">
+                    <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded text-xs font-bold {{ $item['active'] ? 'bg-indigo-50 text-indigo-600' : 'bg-gray-50 text-gray-500 group-hover:bg-gray-100' }}">
+                        {{ strtoupper(substr($item['label'], 0, 1)) }}
+                    </span>
+                    <span x-show="sidebarOpen" x-cloak class="ml-3 whitespace-nowrap">{{ $item['label'] }}</span>
+                </span>
+            </a>
+        @endforeach
+    </nav>
+</aside>

@@ -12,7 +12,12 @@ class RenterController extends Controller
      */
     public function index()
     {
-        return view('Renter.renter_page');
+        $renter = Renter::where('user_id', auth()->id())->first();
+
+        return view('profile.edit', [
+            'user' => $$request->user(),
+            'renter' => $renter,
+        ]);
     }
 
     /**

@@ -6,6 +6,21 @@ use Illuminate\Database\Eloquent\Model;
 
 class Lease extends Model
 {
+    public function property()
+    {
+        return $this->belongsTo(PropertyDetails::class, 'property_id', 'property_id');
+    }
+
+    public function renter()
+    {
+        return $this->belongsTo(Renter::class, 'renter_id', 'renter_id');
+    }
+
+    public function staff()
+    {
+        return $this->belongsTo(Staff::class, 'staff_id', 'staff_id');
+    }
+
     protected $table = 'lease';
 
     protected $primaryKey = 'lease_id';
