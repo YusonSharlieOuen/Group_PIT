@@ -22,9 +22,28 @@
     </head>
     <body class="font-sans antialiased bg-gray-50 overflow-x-hidden">
         <div x-data="{ sidebarOpen: true }" class="min-h-screen">
-            @include('layouts.navigation')
+            @auth
+                @include('layouts.navigation')
+            @else
+                <nav class="border-b border-gray-100 bg-white">
+                    <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+                        <a href="{{ url('/') }}" class="font-serif text-xl font-semibold tracking-[0.25em] text-gray-950">
+                            DREAM HOME
+                        </a>
 
-            <div class="transition-all duration-300" :class="sidebarOpen ? 'lg:pl-64' : 'lg:pl-20'">
+                        <div class="hidden items-center gap-6 text-sm font-medium text-gray-600 sm:flex">
+                            <a href="{{ route('home.find') }}" class="hover:text-gray-950">Find a Home</a>
+                            <a href="{{ route('property.list') }}" class="hover:text-gray-950">List Your Property</a>
+                            <a href="{{ route('services') }}" class="hover:text-gray-950">Services</a>
+                            <a href="{{ route('about') }}" class="hover:text-gray-950">About Us</a>
+                            <a href="{{ route('contact') }}" class="hover:text-gray-950">Contact</a>
+                            <a href="{{ route('login') }}" class="rounded-md bg-gray-900 px-4 py-2 text-white hover:bg-gray-700">Log In</a>
+                        </div>
+                    </div>
+                </nav>
+            @endauth
+
+            <div class="transition-all duration-300" @auth :class="sidebarOpen ? 'lg:pl-64' : 'lg:pl-20'" @endauth>
                 <!-- Page Heading -->
                 @isset($header)
                     <header class="bg-white border-b border-gray-100">
