@@ -5,10 +5,20 @@
     ];
 
     if (auth()->user()?->hasRole('Admin')) {
+<<<<<<< HEAD
         $navItems = array_merge($navItems, [
             ['label' => 'Staff', 'route' => 'staff.index', 'active' => request()->routeIs('staff.*')],
             ['label' => 'Branches', 'route' => 'branch.index', 'active' => request()->routeIs('branch.*')],
             ['label' => 'Admin', 'route' => 'admin.dashboard', 'active' => request()->routeIs('admin*')],
+=======
+        $navItems[] = ['label' => 'Admin', 'route' => 'admin.dashboard', 'active' => request()->routeIs('admin*')];
+    } elseif (auth()->user()?->hasRole('Manager')) {
+        $navItems = array_merge($navItems, [
+            ['label' => 'Manager', 'route' => 'manager.dashboard', 'active' => request()->routeIs('manager*')],
+            ['label' => 'Staff', 'route' => 'staff.index', 'active' => request()->routeIs('staff.*')],
+            ['label' => 'Create Staff', 'route' => 'manager.create', 'active' => request()->routeIs('manager.create')],
+            ['label' => 'Create Lease', 'route' => 'lease.create', 'active' => request()->routeIs('lease.create')]
+>>>>>>> 9fb8695f114ce62a31a9f09630b3afab57a5e62d
         ]);
     } else {
         $navItems = array_merge($navItems, [

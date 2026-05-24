@@ -75,6 +75,11 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/create_lease', [LeaseController::class, 'index'])->name('Lease.index');
 
+    //Manager dashboard
+    Route::get('/Manager/manager_dashboard', [\App\Http\Controllers\ManagerController::class, 'index'])
+        ->name('manager.dashboard')
+        ->middleware(['auth', 'role:Manager']);
+
     // Staff Routes
     Route::get('/staff/create', [StaffController::class, 'create'])
         ->name('staff.create')
@@ -142,6 +147,9 @@ Route::middleware('auth')->group(function () {
         ->name('viewing.store');
 
     // Manager Routes
+    Route::get('/Manager/manager_dashboard', [\App\Http\Controllers\ManagerController::class, 'index'])
+        ->name('manager.dashboard')
+        ->middleware(['auth', 'role:Manager']);
     Route::get('/manager/create-staff', [ManagerController::class, 'create'])
         ->name('manager.create');
     Route::post('/manager/create-staff', [ManagerController::class, 'store'])
