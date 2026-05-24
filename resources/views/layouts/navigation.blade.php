@@ -8,6 +8,13 @@
 
     if (auth()->user()?->hasRole('Admin')) {
         $navItems[] = ['label' => 'Admin', 'route' => 'admin.dashboard', 'active' => request()->routeIs('admin*')];
+    } elseif (auth()->user()?->hasRole('Manager')) {
+        $navItems = array_merge($navItems, [
+            ['label' => 'Manager', 'route' => 'manager.dashboard', 'active' => request()->routeIs('manager*')],
+            ['label' => 'Staff', 'route' => 'staff.index', 'active' => request()->routeIs('staff.*')],
+            ['label' => 'Create Staff', 'route' => 'manager.create', 'active' => request()->routeIs('manager.create')],
+            ['label' => 'Create Lease', 'route' => 'lease.create', 'active' => request()->routeIs('lease.create')]
+        ]);
     } else {
         $navItems = array_merge($navItems, [
             ['label' => 'Find a Home', 'route' => 'home.find', 'active' => request()->routeIs('home.find')],
