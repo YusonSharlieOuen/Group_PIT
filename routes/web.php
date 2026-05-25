@@ -46,8 +46,18 @@ Route::get('/dashboard', function () {
 
 
     // Redirect admins and managers to /admin
-    if ($user && (in_array(strtolower($user->user_type ?? ''), ['admin', 'management'], true) || $user->hasRole(['Admin','Manager']))) {
+    // if ($user && (in_array(strtolower($user->user_type ?? ''), ['admin', 'manager'], true) || $user->hasRole(['Admin','Manager']))) {
+    //     return redirect()->route('admin.dashboard');
+    // }
+
+    // Redirect Admin
+    if ($user && (strtolower($user->user_type ?? '') === 'admin' || $user->hasRole('Admin'))) {
         return redirect()->route('admin.dashboard');
+    }
+
+    // Redirect Manager
+    if ($user && (strtolower($user->user_type ?? '') === 'manager' || $user->hasRole('Manager'))) {
+        return redirect()->route('manager.dashboard');
     }
 
     // Renters (and anyone else) see the featured listings dashboard
@@ -67,7 +77,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/staff', [StaffController::class, 'index'])
         ->name('staff.index')
-        ->middleware(\App\Http\Middleware\RoleMiddleware::class.':Admin');
+        ->middleware(\App\Http\Middleware\RoleMiddleware::class.':Admin,Manager');
 
     // Admin dashboard
     Route::get('/admin', [\App\Http\Controllers\AdminController::class, 'index'])
@@ -174,10 +184,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/Manager/manager_dashboard', [\App\Http\Controllers\ManagerController::class, 'index'])
         ->name('manager.dashboard')
         ->middleware(['auth', 'role:Manager']);
+    
+    Route::middleware(['auth', 'role:Manager'])->group(function () {
     Route::get('/manager/create-staff', [ManagerController::class, 'create'])
         ->name('manager.create');
     Route::post('/manager/create-staff', [ManagerController::class, 'store'])
         ->name('manager.store');
+    });
 
     // Admin Routes
     Route::get('/admin/create-staff', [AdminController::class, 'create'])

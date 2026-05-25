@@ -50,7 +50,7 @@ class LeaseController extends Controller
 
         $renters = Renter::all();
 
-        $staff = Staff::all();
+        $staff = Staff::where('position', 'Staff')->get();
 
         return view('Lease.create_lease', compact(
             'leaseId',
@@ -68,7 +68,7 @@ class LeaseController extends Controller
         $request->validate([
             'lease_id' => 'required|unique:lease,lease_id',
 
-            'property_id' => 'required|exists:property_details,property_id',
+            'property_id' => 'required|exists:property,property_id',
             'renter_id' => 'required|exists:renter,renter_id',
             'staff_id' => 'required|exists:staff,staff_id',
 
@@ -113,10 +113,9 @@ class LeaseController extends Controller
             'duration' => round($duration),
         ]);
 
-        return back()->with(
-            'success',
-            'Lease created successfully.'
-        );
+        return redirect()
+            ->route('lease.create')
+            ->with('success', 'Lease created successfully.');
     }
 
     public function display_all_leases()

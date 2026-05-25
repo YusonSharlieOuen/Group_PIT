@@ -21,22 +21,26 @@ class RoleMiddleware
         $user = $request->user();
 
         if (! $user) {
-            abort(Response::HTTP_FORBIDDEN);
+            abort(403);
         }
 
-        $allowed = [];
-        if ($roles) {
-            $allowed = array_map('trim', explode(',', $roles));
-            $allowed = array_map('strtolower', $allowed);
-        }
+        $allowed = $roles ? array_map('strtolower', array_map('trim', explode(',', $roles))) : [];
 
-        $position = null;
-        if (method_exists($user, 'staff') && $user->staff) {
-            $position = strtolower($user->staff->position);
-        }
+        $userType = strtolower($user->user_type ?? '');
 
-        if (empty($allowed) || ! $position || ! in_array($position, $allowed, true)) {
-            abort(Response::HTTP_FORBIDDEN, 'Unauthorized.');
+        $staffPosition = $user->staff ? strtolower($user->staff->position) : null;
+
+        // check BOTH systems
+        if (!empty($allowed)) {
+
+            if (
+                in_array($userType, $allowed, true) ||
+                in_array($staffPosition, $allowed, true)
+            ) {
+                return $next($request);
+            }
+
+            abort(403, 'Unauthorized.');
         }
 
         return $next($request);
