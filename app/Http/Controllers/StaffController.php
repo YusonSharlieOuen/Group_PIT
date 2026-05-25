@@ -13,16 +13,57 @@ use Illuminate\Validation\Rules;
 
 class StaffController extends Controller
 {
+    private function ensureUniqueStaffId(?string $providedStaffId): string
+    {
+        // Prefer the provided value if it’s unique.
+        if (! empty($providedStaffId) && ! Staff::where('staff_id', $providedStaffId)->exists()) {
+            return $providedStaffId;
+        }
+
+        $lastId = Staff::query()
+            ->whereNotNull('staff_id')
+            ->orderByRaw("CAST(REGEXP_SUBSTR(staff_id, '[0-9]+') AS UNSIGNED) DESC")
+            ->value('staff_id');
+
+        // Fallback for databases without REGEXP_SUBSTR.
+        if ($lastId === null) {
+            $lastId = Staff::query()->orderByDesc('staff_id')->value('staff_id');
+        }
+
+        $num = preg_match('/([0-9]+)$/', (string) $lastId, $m) ? (int) $m[1] : 0;
+        $nextNum = $num + 1;
+
+        // Detect prefix from provided ID if present; otherwise infer from last ID.
+        $prefix = '';
+        if (! empty($providedStaffId)) {
+            $prefix = preg_replace('/[0-9]+$/', '', (string) $providedStaffId);
+        }
+        if (empty($prefix)) {
+            $prefix = preg_replace('/[0-9]+$/', '', (string) $lastId);
+        }
+        if (empty($prefix)) {
+            $prefix = 'S';
+        }
+
+        return $prefix . $nextNum;
+    }
+
     
     public function index()
     {
-        $staffs = Staff::with(['branch', 'supervisor', 'nextOfKin'])
+$staffs = Staff::with([
+                // Branch table uses non-standard primary key: branch.branch_id (NOT id)
+'branch:branch_id,street,area,city,postcode,telephone',
+'supervisor:staff_id,first_name,last_name,position',
+'nextOfKin:kin_id,staff_id,full_name,relationship,phone,address',
+            ])
             ->orderBy('staff_id')
             ->paginate(5)
             ->withQueryString();
 
         return view('staff_details.index', compact('staffs'));
     }
+
 
     public function create()
     {
@@ -35,7 +76,7 @@ class StaffController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'staff_id' => ['required', 'string', 'max:10', 'unique:staff,staff_id'],
+            'staff_id' => ['nullable', 'string', 'max:10'],
             'first_name' => ['required', 'string', 'max:50'],
             'last_name' => ['required', 'string', 'max:50'],
             'address' => ['nullable', 'string'],
@@ -56,8 +97,13 @@ class StaffController extends Controller
             return back()->withInput()->withErrors(['password' => 'Password is required when email is provided.']);
         }
 
+        // Ensure strictly unique primary key (staff_id)
+        $validated['staff_id'] = $this->ensureUniqueStaffId($validated['staff_id'] ?? null);
+
+
         $staffData = collect($validated)->except(['email', 'password', 'password_confirmation'])->toArray();
         $staff = Staff::create($staffData);
+
 
         if (! empty($validated['email'])) {
             $user = User::create([

@@ -14,8 +14,18 @@ class ViewingController extends Controller
      */
     public function index()
     {
-        //
+        $viewings = Viewing::with(['renter', 'propertyDetails'])->get();
+
+        return view('Admin.viewings.index', compact('viewings'));
     }
+
+    public function calendar()
+    {
+        $viewings = Viewing::with(['renter', 'propertyDetails'])->get();
+
+        return view('Admin.viewings.calendar', compact('viewings'));
+    }
+
 
     /**
      * Show the form for creating a new resource.
@@ -25,10 +35,7 @@ class ViewingController extends Controller
         $properties = PropertyDetails::all();
         $renters = Renter::all();
 
-        return view('Viewing.create_viewing', compact(
-            'properties',
-            'renters'
-        ));
+        return view('Viewing.create_viewing', compact('properties', 'renters'));
     }
 
     /**
@@ -58,7 +65,9 @@ class ViewingController extends Controller
      */
     public function show(Viewing $viewing)
     {
-        $viewings = Viewing::where('property_id', $id)->with('renter')->get();
+        $viewing->load(['renter', 'propertyDetails']);
+
+        return view('Admin.viewings.show', compact('viewing'));
     }
 
     /**
@@ -66,7 +75,10 @@ class ViewingController extends Controller
      */
     public function edit(Viewing $viewing)
     {
-        //
+        $properties = PropertyDetails::all();
+        $renters = Renter::all();
+
+        return view('Admin.viewings.edit', compact('viewing', 'properties', 'renters'));
     }
 
     /**
@@ -74,7 +86,21 @@ class ViewingController extends Controller
      */
     public function update(Request $request, Viewing $viewing)
     {
-        //
+        $request->validate([
+            'property_id' => 'required|exists:property,property_id',
+            'renter_id' => 'required|exists:renter,renter_id',
+            'viewing_date' => 'required|date',
+            'comments' => 'nullable|string',
+        ]);
+
+        $viewing->update([
+            'property_id' => $request->property_id,
+            'renter_id' => $request->renter_id,
+            'viewing_date' => $request->viewing_date,
+            'comments' => $request->comments,
+        ]);
+
+        return redirect()->route('admin.viewings.index')->with('success', 'Viewing updated successfully.');
     }
 
     /**
@@ -82,6 +108,9 @@ class ViewingController extends Controller
      */
     public function destroy(Viewing $viewing)
     {
-        //
+        $viewing->delete();
+
+        return redirect()->route('admin.viewings.index')->with('success', 'Viewing deleted successfully.');
     }
 }
+

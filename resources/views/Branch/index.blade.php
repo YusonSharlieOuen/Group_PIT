@@ -27,6 +27,7 @@
                                 <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Branch ID</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Address</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Telephone</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Fax</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Staff</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Properties</th>
                                 <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
@@ -37,9 +38,15 @@
                                 <tr class="hover:bg-gray-50">
                                     <td class="whitespace-nowrap px-6 py-4 text-sm font-semibold text-gray-900">{{ $branch->branch_id }}</td>
                                     <td class="px-6 py-4 text-sm text-gray-700">
-                                        {{ $branch->street ?? 'N/A' }}, {{ $branch->area ?? 'N/A' }}, {{ $branch->city ?? 'N/A' }} {{ $branch->postcode }}
+                                        <div class="leading-relaxed">
+                                            <div><span class="font-medium">Street:</span> {{ $branch->street ?? 'N/A' }}</div>
+                                            <div><span class="font-medium">Area:</span> {{ $branch->area ?? 'N/A' }}</div>
+                                            <div><span class="font-medium">City:</span> {{ $branch->city ?? 'N/A' }}</div>
+                                            <div><span class="font-medium">Postcode:</span> {{ $branch->postcode ?? 'N/A' }}</div>
+                                        </div>
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">{{ $branch->telephone ?? 'N/A' }}</td>
+                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">{{ $branch->fax ?? 'N/A' }}</td>
                                     <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">{{ $branch->staff_count }}</td>
                                     <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">{{ $branch->properties_count }}</td>
                                     <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">

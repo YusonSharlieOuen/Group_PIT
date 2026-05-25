@@ -52,14 +52,17 @@
 
         </div>
 
-        <!-- CREATE VIEWING -->
+        <!-- BOOKING GUI (Create Viewing) -->
         <div class="mt-10 bg-white border border-gray-200 rounded-2xl shadow-md p-6">
 
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">
-                Create Viewing
+            <h2 class="text-2xl font-bold text-gray-800 mb-1">
+                Book this property
             </h2>
+            <p class="text-sm text-gray-600 mb-6">
+                Pick a renter and select a viewing date.
+            </p>
 
-            <form action="{{ route('viewing.store') }}" method="POST">
+            <form action="{{ route('viewing.store') }}" method="POST" class="space-y-6">
 
                 @csrf
 

@@ -47,21 +47,86 @@
                                 <th class="px-2 py-1 font-medium">Name</th>
                                 <th class="px-2 py-1 font-medium">Position</th>
                                 <th class="px-2 py-1 font-medium">Branch</th>
+                                <th class="px-2 py-1 font-medium">Salary</th>
+                                <th class="px-2 py-1 font-medium">Sex</th>
+                                <th class="px-2 py-1 font-medium">Date of Birth</th>
+                                <th class="px-2 py-1 font-medium">Date Joined</th>
                                 <th class="px-2 py-1 font-medium">Supervisor</th>
                                 <th class="px-2 py-1 text-right font-medium">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse ($staffs as $staff)
-                                <tr class="text-base text-gray-950">
+                                <tr id="staff-{{ $staff->staff_id }}" class="text-base text-gray-950">
                                     <td class="bg-gray-300 px-2 py-2 font-medium">{{ $staff->staff_id }}</td>
                                     <td class="bg-gray-300 px-2 py-2">{{ $staff->first_name }} {{ $staff->last_name }}</td>
                                     <td class="bg-gray-300 px-2 py-2">{{ $staff->position }}</td>
-                                    <td class="bg-gray-300 px-2 py-2">{{ $staff->branch_id ?? 'None' }}</td>
-                                    <td class="bg-gray-300 px-2 py-2">{{ $staff->supervisor_id ?? 'None' }}</td>
+                                    <td class="bg-gray-300 px-2 py-2">{{ $staff->branch->branch_id ?? 'N/A' }}</td>
+                                    <td class="bg-gray-300 px-2 py-2">{{ is_null($staff->salary) ? 'N/A' : 'PHP ' . number_format($staff->salary, 2) }}</td>
+                                    <td class="bg-gray-300 px-2 py-2">{{ $staff->sex ?? 'N/A' }}</td>
+
+                                    <td class="bg-gray-300 px-2 py-2">{{ $staff->date_of_birth ? date('M d, Y', strtotime($staff->date_of_birth)) : 'N/A' }}</td>
+                                    <td class="bg-gray-300 px-2 py-2">{{ $staff->date_joined ? date('M d, Y', strtotime($staff->date_joined)) : 'N/A' }}</td>
+
+                                    <td class="bg-gray-300 px-2 py-2">
+                                        @if($staff->supervisor)
+                                            {{ $staff->supervisor->first_name }} {{ $staff->supervisor->last_name }}
+                                        @else
+                                            None
+                                        @endif
+                                    </td>
                                     <td class="whitespace-nowrap bg-gray-300 px-2 py-2 text-right text-sm">
-                                        <a href="{{ route('staff.show', $staff->staff_id) }}" class="font-medium text-gray-900 hover:underline">view</a>
-                                        <a href="{{ route('staff.edit', $staff->staff_id) }}" class="ml-3 font-medium text-gray-900 hover:underline">edit</a>
+                                        <div class="flex items-center justify-end gap-2">
+                                            <a href="{{ route('staff.show', $staff->staff_id) }}" class="font-medium text-gray-900 hover:underline">view</a>
+                                            @if(auth()->user()?->hasRole('Admin'))
+                                                <a href="{{ route('staff.edit', $staff->staff_id) }}" class="font-medium text-gray-900 hover:underline">edit</a>
+                                            @endif
+
+
+                                        @if($staff->nextOfKin)
+                                            <button type="button" class="ml-3 font-medium text-gray-900 hover:underline" data-modal-target="nok-{{ $staff->staff_id }}">
+                                                Next of Kin
+                                            </button>
+                                        @else
+                                            <a href="{{ route('staff.nextofkin.create', $staff->staff_id) }}" class="ml-3 font-medium text-gray-900 hover:underline">
+                                                Add Next of Kin
+                                            </a>
+                                        @endif
+
+                                        @if($staff->nextOfKin)
+                                            <div id="nok-{{ $staff->staff_id }}" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4">
+                                                <div class="w-full max-w-md rounded-lg bg-white p-5 shadow">
+                                                    <div class="flex items-center justify-between">
+                                                        <h3 class="text-lg font-semibold text-gray-900">Next of Kin</h3>
+                                                        <button type="button" class="text-gray-500 hover:text-gray-800" data-modal-close="nok-{{ $staff->staff_id }}">&times;</button>
+                                                    </div>
+
+                                                    <div class="mt-4 space-y-3 text-sm">
+                                                        <div>
+                                                            <div class="text-xs font-semibold uppercase tracking-wider text-gray-500">Full Name</div>
+                                                            <div class="text-gray-900">{{ $staff->nextOfKin->full_name }}</div>
+                                                        </div>
+                                                        <div>
+                                                            <div class="text-xs font-semibold uppercase tracking-wider text-gray-500">Relationship</div>
+                                                            <div class="text-gray-900">{{ $staff->nextOfKin->relationship ?? 'N/A' }}</div>
+                                                        </div>
+                                                        <div>
+                                                            <div class="text-xs font-semibold uppercase tracking-wider text-gray-500">Phone</div>
+                                                            <div class="text-gray-900">{{ $staff->nextOfKin->phone ?? 'N/A' }}</div>
+                                                        </div>
+                                                        <div>
+                                                            <div class="text-xs font-semibold uppercase tracking-wider text-gray-500">Address</div>
+                                                            <div class="text-gray-900">{{ $staff->nextOfKin->address ?? 'N/A' }}</div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="mt-5 flex justify-end gap-3">
+                                                        <a href="{{ route('staff.nextofkin.create', $staff->staff_id) }}" class="rounded-md bg-gray-900 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-700">Edit/Add</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endif
+
                                         <form action="{{ route('staff.destroy', $staff->staff_id) }}" method="POST" class="ml-3 inline" onsubmit="return confirm('Delete this staff record?');">
                                             @csrf
                                             @method('DELETE')
@@ -113,4 +178,33 @@
             </div>
         </div>
     </div>
+<script>
+    document.addEventListener('click', function (e) {
+        const openBtn = e.target.closest('[data-modal-target]');
+        if (openBtn) {
+            const targetId = openBtn.getAttribute('data-modal-target');
+            const modal = document.getElementById(targetId);
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        const closeBtn = e.target.closest('[data-modal-close]');
+        if (closeBtn) {
+            const targetId = closeBtn.getAttribute('data-modal-close');
+            const modal = document.getElementById(targetId);
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        const overlay = e.target.closest('.fixed.inset-0');
+        if (overlay) {
+            overlay.classList.add('hidden');
+            overlay.classList.remove('flex');
+        }
+    });
+</script>
 </x-app-layout>

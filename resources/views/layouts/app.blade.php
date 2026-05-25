@@ -25,6 +25,9 @@
             @include('layouts.navigation')
 
             <div class="transition-all duration-300" :class="sidebarOpen ? 'lg:pl-64' : 'lg:pl-20'">
+                {{-- keep page content from sitting under the fixed sidebar/header --}}
+                <div class="pt-4">
+
                 <!-- Page Heading -->
                 @isset($header)
                     <header class="bg-white border-b border-gray-100">
@@ -38,6 +41,8 @@
                 <main>
                     {{ $slot }}
                 </main>
+                </div>
+            </div>
             </div>
         </div>
     </body>

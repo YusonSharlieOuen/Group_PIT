@@ -1,5 +1,7 @@
-- [x] Update create property GUI in resources/views/Property/create_property.blade.php to use <x-app-layout> and Tailwind admin styling
-- [x] Preserve existing form fields and route/action + CSRF + enctype
-- [x] Preserve branch -> staff AJAX dropdown behavior
-- [x] Verify validation error display matches existing $errors usage
-- [x] Smoke test: open /admin and click Create Property; ensure form renders and submitting hits property.details.store
+# TODO
+
+- [ ] Fix Eloquent model primary keys to avoid selecting a non-existent `id` column (Branch, Staff).
+- [ ] Ensure eager-loading/select constraints include the correct primary key columns (`branch_id`, `staff_id`).
+- [ ] Verify/patch any relationship or controller query that assumes `id` for Branch/Staff.
+- [ ] Run a quick smoke test for the route that triggers SQLSTATE[42703].
+

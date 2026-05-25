@@ -40,10 +40,23 @@ Route::get('/contact', function () {
 })->name('contact');
 
 Route::get('/dashboard', function () {
+    $user = auth()->user();
+
+    // Safety: if roles/guards already handle access, this won't block them.
+
+
+    // Redirect admins and managers to /admin
+    if ($user && (in_array(strtolower($user->user_type ?? ''), ['admin', 'management'], true) || $user->hasRole(['Admin','Manager']))) {
+        return redirect()->route('admin.dashboard');
+    }
+
+    // Renters (and anyone else) see the featured listings dashboard
+
     $featuredProperties = PropertyDetails::take(3)->get();
 
     return view('dashboard', compact('featuredProperties'));
 })->middleware(['auth', 'verified'])->name('dashboard');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -139,12 +152,23 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/get-staff/{branch_id}', [PropertyDetailsController::class, 'getStaffByBranch']);
 
-    // Viewing Routes
+    // Viewing Routes (Client create)
     Route::get('/viewing/create', [ViewingController::class, 'create'])
         ->name('viewing.create');
 
     Route::post('/viewing/store', [ViewingController::class, 'store'])
         ->name('viewing.store');
+
+    // Admin Viewing Management
+    Route::middleware(['auth', 'role:Admin'])->group(function () {
+        Route::get('/admin/viewings', [ViewingController::class, 'index'])->name('admin.viewings.index');
+        Route::get('/admin/viewings/calendar', [ViewingController::class, 'calendar'])->name('admin.viewings.calendar');
+        Route::get('/admin/viewings/{viewing}/edit', [ViewingController::class, 'edit'])->name('viewing.edit');
+        Route::put('/admin/viewings/{viewing}', [ViewingController::class, 'update'])->name('viewing.update');
+        Route::delete('/admin/viewings/{viewing}', [ViewingController::class, 'destroy'])->name('viewing.destroy');
+    });
+
+
 
     // Manager Routes
     Route::get('/Manager/manager_dashboard', [\App\Http\Controllers\ManagerController::class, 'index'])

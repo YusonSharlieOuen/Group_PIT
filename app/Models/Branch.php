@@ -8,15 +8,16 @@ class Branch extends Model
 {
     protected $table = 'branch';
 
-    public $timestamps = false;
-
+    // Primary key is NOT `id` in this schema.
     protected $primaryKey = 'branch_id';
-
     public $incrementing = false;
-
     protected $keyType = 'string';
 
+
+    public $timestamps = false;
+
     protected $fillable = [
+
         'branch_id',
         'street',
         'area',

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Viewing extends Model
 {
+
     protected $table = 'viewing';
 
     protected $primaryKey = 'viewing_id';
@@ -21,10 +22,12 @@ class Viewing extends Model
 
     public function renter()
     {
-        return $this->belongsTo(
-            Renter::class,
-            'renter_id',
-            'renter_id'
-        );
+        return $this->belongsTo(Renter::class, 'renter_id', 'renter_id');
+    }
+
+    public function propertyDetails()
+    {
+        return $this->belongsTo(PropertyDetails::class, 'property_id', 'property_id');
     }
 }
+

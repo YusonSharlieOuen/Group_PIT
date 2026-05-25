@@ -5,20 +5,17 @@
     ];
 
     if (auth()->user()?->hasRole('Admin')) {
-<<<<<<< HEAD
         $navItems = array_merge($navItems, [
             ['label' => 'Staff', 'route' => 'staff.index', 'active' => request()->routeIs('staff.*')],
             ['label' => 'Branches', 'route' => 'branch.index', 'active' => request()->routeIs('branch.*')],
             ['label' => 'Admin', 'route' => 'admin.dashboard', 'active' => request()->routeIs('admin*')],
-=======
-        $navItems[] = ['label' => 'Admin', 'route' => 'admin.dashboard', 'active' => request()->routeIs('admin*')];
+        ]);
     } elseif (auth()->user()?->hasRole('Manager')) {
         $navItems = array_merge($navItems, [
             ['label' => 'Manager', 'route' => 'manager.dashboard', 'active' => request()->routeIs('manager*')],
             ['label' => 'Staff', 'route' => 'staff.index', 'active' => request()->routeIs('staff.*')],
             ['label' => 'Create Staff', 'route' => 'manager.create', 'active' => request()->routeIs('manager.create')],
-            ['label' => 'Create Lease', 'route' => 'lease.create', 'active' => request()->routeIs('lease.create')]
->>>>>>> 9fb8695f114ce62a31a9f09630b3afab57a5e62d
+            ['label' => 'Create Lease', 'route' => 'lease.create', 'active' => request()->routeIs('lease.create')],
         ]);
     } else {
         $navItems = array_merge($navItems, [
@@ -49,14 +46,19 @@
 ></div>
 
 <aside
-    class="fixed inset-y-0 left-0 z-40 flex flex-col border-r border-gray-200 bg-white shadow-sm transition-all duration-300"
+    class="fixed top-4 bottom-0 left-0 z-40 flex flex-col border-r border-gray-200 bg-white shadow-sm transition-all duration-300"
     :class="[
         sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
         sidebarOpen ? 'w-64' : 'lg:w-20'
     ]"
 >
     <div class="flex h-16 items-center gap-3 border-b border-gray-100 px-4" :class="sidebarOpen ? 'justify-between' : 'justify-center'">
-        <a href="{{ route('dashboard') }}" class="flex items-center gap-3 overflow-hidden">
+        @php
+            $user = Auth::user();
+            $userType = $user?->user_type;
+            $isAdminOrManagement = in_array(strtolower($userType ?? ''), ['admin', 'management'], true) || $user?->hasRole(['Admin','Manager']);
+        @endphp
+        <a href="{{ $isAdminOrManagement ? route('admin.dashboard') : route('dashboard') }}" class="flex items-center gap-3 overflow-hidden">
             <x-application-logo class="h-9 w-auto shrink-0 fill-current text-gray-800" />
             <span x-show="sidebarOpen" x-cloak class="whitespace-nowrap font-serif text-lg font-semibold tracking-widest text-gray-950">
                 DREAM
@@ -123,9 +125,21 @@
         </x-dropdown>
     </div>
 
+    @php
+        $user = Auth::user();
+        $userType = $user?->user_type;
+        $isAdminOrManagement = in_array(strtolower($userType ?? ''), ['admin', 'management'], true) || $user?->hasRole(['Admin','Manager']);
+        $isRenter = strtolower($userType ?? '') === 'renter' || $user?->hasRole('Renter');
+    @endphp
+
     <nav class="flex-1 space-y-1 px-3 py-5">
         @foreach ($navItems as $item)
-            <a href="{{ route($item['route']) }}"
+            @continue(
+                ($isRenter && in_array($item['label'], ['Staff', 'Branches', 'Admin'], true)) ||
+                (!$isRenter && in_array($item['label'], ['Find a Home', 'Services', 'About Us', 'Contact'], true))
+            )
+
+            <a href="{{ $item['route'] === 'dashboard' ? ($isAdminOrManagement ? route('admin.dashboard') : route('dashboard')) : route($item['route']) }}"
                class="group flex items-center rounded-md px-3 py-2 text-sm font-medium transition"
                :class="sidebarOpen ? 'justify-start' : 'justify-center'"
                title="{{ $item['label'] }}"
@@ -141,3 +155,4 @@
         @endforeach
     </nav>
 </aside>
+
