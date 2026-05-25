@@ -1,24 +1,52 @@
 @php
+    $user = Auth::user();
+    $profilePhotoUrl = null;
+
+    if ($user?->profile_photo_path) {
+        $isExternalPhoto = str_starts_with($user->profile_photo_path, 'http://')
+            || str_starts_with($user->profile_photo_path, 'https://');
+
+        if ($isExternalPhoto) {
+            $profilePhotoUrl = $user->profile_photo_path;
+        } elseif (Storage::disk('public')->exists($user->profile_photo_path)) {
+            $profilePhotoUrl = Storage::disk('public')->url($user->profile_photo_path);
+        }
+    }
+
+    $isLinkedRenter = (bool) $user?->renter;
     $dashboardRoute = 'dashboard';
 
-    if (auth()->user()?->hasRole('Admin')) {
+    if ($user?->hasRole('Admin')) {
         $dashboardRoute = 'admin.dashboard';
-    } elseif (auth()->user()?->hasRole('Manager')) {
+    } elseif ($user?->hasRole('Manager')) {
         $dashboardRoute = 'manager.dashboard';
     }
 
-    $navItems = [
-        ['label' => 'Dashboard', 'route' => $dashboardRoute, 'active' => request()->routeIs('dashboard') || request()->routeIs('admin.dashboard') || request()->routeIs('manager.dashboard')],
-        ['label' => 'Profile', 'route' => 'profile.edit', 'active' => request()->routeIs('profile.edit')],
-    ];
+    $navItems = [];
 
-    if (auth()->user()?->hasRole('Admin')) {
+    if ($user && $isLinkedRenter) {
+        $navItems = [
+            ['label' => 'Dashboard', 'route' => 'dashboard', 'active' => request()->routeIs('dashboard')],
+            ['label' => 'Browse Properties', 'href' => route('dashboard').'#browse-properties', 'active' => request()->routeIs('home.find')],
+            ['label' => 'My Viewings', 'href' => route('dashboard').'#my-viewings', 'active' => request()->routeIs('viewing.create')],
+            ['label' => 'My Lease', 'href' => route('dashboard').'#my-lease', 'active' => false],
+            ['label' => 'Profile', 'route' => 'profile.edit', 'active' => request()->routeIs('profile.edit')],
+            ['label' => 'Notifications', 'href' => route('dashboard').'#notifications', 'active' => false],
+        ];
+    } elseif ($user) {
+        $navItems = [
+            ['label' => 'Dashboard', 'route' => $dashboardRoute, 'active' => request()->routeIs('dashboard') || request()->routeIs('admin.dashboard') || request()->routeIs('manager.dashboard')],
+            ['label' => 'Profile', 'route' => 'profile.edit', 'active' => request()->routeIs('profile.edit')],
+        ];
+    }
+
+    if ($user?->hasRole('Admin')) {
         $navItems = array_merge($navItems, [
             ['label' => 'Staff', 'route' => 'staff.index', 'active' => request()->routeIs('staff.*')],
             ['label' => 'Branches', 'route' => 'branch.index', 'active' => request()->routeIs('branch.*')],
             ['label' => 'Admin', 'route' => 'admin.dashboard', 'active' => request()->routeIs('admin*')],
         ]);
-    } elseif (auth()->user()?->hasRole('Manager')) {
+    } elseif ($user?->hasRole('Manager')) {
         $navItems = array_merge($navItems, [
             ['label' => 'Staff', 'route' => 'staff.index', 'active' => request()->routeIs('staff.*')],
             ['label' => 'Create Staff', 'route' => 'manager.create', 'active' => request()->routeIs('manager.create')],
@@ -27,6 +55,7 @@
     } else {
         $navItems = array_merge($navItems, [
             ['label' => 'Find a Home', 'route' => 'home.find', 'active' => request()->routeIs('home.find')],
+            ['label' => 'List Property', 'route' => 'property.list', 'active' => request()->routeIs('property.list')],
             ['label' => 'Services', 'route' => 'services', 'active' => request()->routeIs('services')],
             ['label' => 'About Us', 'route' => 'about', 'active' => request()->routeIs('about')],
             ['label' => 'Contact', 'route' => 'contact', 'active' => request()->routeIs('contact')],
@@ -53,7 +82,7 @@
 ></div>
 
 <aside
-    class="fixed top-4 bottom-0 left-0 z-40 flex flex-col border-r border-gray-200 bg-white shadow-sm transition-all duration-300"
+    class="fixed inset-y-0 left-0 z-40 flex flex-col border-r border-gray-200 bg-white shadow-sm transition-all duration-300"
     :class="[
         sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
         sidebarOpen ? 'w-64' : 'lg:w-20'
@@ -61,11 +90,11 @@
 >
     <div class="flex h-16 items-center gap-3 border-b border-gray-100 px-4" :class="sidebarOpen ? 'justify-between' : 'justify-center'">
         @php
-            $user = Auth::user();
             $userType = $user?->user_type;
             $isAdminOrManagement = in_array(strtolower($userType ?? ''), ['admin', 'management'], true) || $user?->hasRole(['Admin','Manager']);
+            $homeRoute = $user ? ($isAdminOrManagement ? route('admin.dashboard') : route('dashboard')) : route('home.find');
         @endphp
-        <a href="{{ $isAdminOrManagement ? route('admin.dashboard') : route('dashboard') }}" class="flex items-center gap-3 overflow-hidden">
+        <a href="{{ $homeRoute }}" class="flex items-center gap-3 overflow-hidden">
             <x-application-logo class="h-9 w-auto shrink-0 fill-current text-gray-800" />
             <span x-show="sidebarOpen" x-cloak class="whitespace-nowrap font-serif text-lg font-semibold tracking-widest text-gray-950">
                 DREAM
@@ -88,20 +117,21 @@
     </div>
 
     <div class="border-b border-gray-100 px-4 py-5">
+        @auth
         <div class="mb-4 flex items-center" :class="sidebarOpen ? 'justify-start gap-3' : 'justify-center'">
-            @if (Auth::user()->profile_photo_path)
-                <img src="{{ asset('storage/'.Auth::user()->profile_photo_path) }}"
+            @if ($profilePhotoUrl)
+                <img src="{{ $profilePhotoUrl }}"
                      class="h-12 w-12 rounded-full border-2 border-white object-cover shadow-sm"
-                     alt="{{ Auth::user()->name }}">
+                     alt="{{ $user->name }}">
             @else
                 <div class="flex h-12 w-12 items-center justify-center rounded-full border-2 border-white bg-gray-100 text-sm font-bold text-gray-700 shadow-sm">
-                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                    {{ strtoupper(substr($user->name, 0, 1)) }}
                 </div>
             @endif
 
             <div x-show="sidebarOpen" x-cloak class="min-w-0">
-                <p class="truncate text-sm font-semibold text-gray-900">{{ Auth::user()->name }}</p>
-                <p class="truncate text-xs text-gray-500">{{ Auth::user()->email }}</p>
+                <p class="truncate text-sm font-semibold text-gray-900">{{ $user->name }}</p>
+                <p class="truncate text-xs text-gray-500">{{ $user->email }}</p>
             </div>
         </div>
 
@@ -130,10 +160,21 @@
                 </form>
             </x-slot>
         </x-dropdown>
+        @else
+            <div class="space-y-2">
+                <a href="{{ route('login') }}" class="flex items-center rounded-md px-3 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-50 hover:text-gray-950" :class="sidebarOpen ? 'justify-start' : 'justify-center'">
+                    <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-gray-50 text-xs font-bold text-gray-500">L</span>
+                    <span x-show="sidebarOpen" x-cloak class="ml-3 whitespace-nowrap">Log In</span>
+                </a>
+                <a href="{{ route('register') }}" class="flex items-center rounded-md px-3 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-50 hover:text-gray-950" :class="sidebarOpen ? 'justify-start' : 'justify-center'">
+                    <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-gray-50 text-xs font-bold text-gray-500">R</span>
+                    <span x-show="sidebarOpen" x-cloak class="ml-3 whitespace-nowrap">Register</span>
+                </a>
+            </div>
+        @endauth
     </div>
 
     @php
-        $user = Auth::user();
         $userType = $user?->user_type;
         $isAdminOrManagement = in_array(strtolower($userType ?? ''), ['admin', 'management'], true) || $user?->hasRole(['Admin','Manager']);
         $isRenter = strtolower($userType ?? '') === 'renter' || $user?->hasRole('Renter');
@@ -143,10 +184,10 @@
         @foreach ($navItems as $item)
             @continue(
                 ($isRenter && in_array($item['label'], ['Staff', 'Branches', 'Admin'], true)) ||
-                (!$isRenter && in_array($item['label'], ['Find a Home', 'Services', 'About Us', 'Contact'], true))
+                ($user && !$isRenter && in_array($item['label'], ['Find a Home', 'List Property', 'Services', 'About Us', 'Contact'], true))
             )
 
-            <a href="{{ $item['route'] === 'dashboard' ? ($isAdminOrManagement ? route('admin.dashboard') : route('dashboard')) : route($item['route']) }}"
+            <a href="{{ $item['href'] ?? ($item['route'] === 'dashboard' ? ($isAdminOrManagement ? route('admin.dashboard') : route('dashboard')) : route($item['route'])) }}"
                class="group flex items-center rounded-md px-3 py-2 text-sm font-medium transition"
                :class="sidebarOpen ? 'justify-start' : 'justify-center'"
                title="{{ $item['label'] }}"
@@ -162,4 +203,3 @@
         @endforeach
     </nav>
 </aside>
-

@@ -1,4 +1,20 @@
 <x-app-layout>
+    @php
+        $user = auth()->user();
+        $profilePhotoUrl = null;
+
+        if ($user?->profile_photo_path) {
+            $isExternalPhoto = str_starts_with($user->profile_photo_path, 'http://')
+                || str_starts_with($user->profile_photo_path, 'https://');
+
+            if ($isExternalPhoto) {
+                $profilePhotoUrl = $user->profile_photo_path;
+            } elseif (Storage::disk('public')->exists($user->profile_photo_path)) {
+                $profilePhotoUrl = Storage::disk('public')->url($user->profile_photo_path);
+            }
+        }
+    @endphp
+
     <x-slot name="header">
         <div class="flex justify-between items-center w-full">
             <h2 class="font-serif text-3xl text-gray-800 leading-tight uppercase tracking-[0.3em]">
@@ -16,8 +32,8 @@
                         <div class="flex items-center gap-6">
                             <!-- Avatar -->
                             <div class="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                                @if(auth()->user()->profile_photo_path)
-                                    <img src="{{ auth()->user()->profile_photo_path }}" alt="Profile" class="w-full h-full object-cover">
+                                @if($profilePhotoUrl)
+                                    <img src="{{ $profilePhotoUrl }}" alt="Profile" class="w-full h-full object-cover">
                                 @else
                                     <svg class="w-12 h-12 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>

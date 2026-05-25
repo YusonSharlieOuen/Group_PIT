@@ -21,6 +21,23 @@ class ProfileTest extends TestCase
         $response->assertOk();
     }
 
+    public function test_profile_uses_initials_when_saved_photo_file_is_missing(): void
+    {
+        $user = User::factory()->create([
+            'name' => 'Leandro Mijares',
+            'profile_photo_path' => 'profile-photos/missing-avatar.jpg',
+        ]);
+
+        $response = $this
+            ->actingAs($user)
+            ->get('/profile');
+
+        $response
+            ->assertOk()
+            ->assertDontSee('storage/profile-photos/missing-avatar.jpg')
+            ->assertSee('L');
+    }
+
     public function test_profile_information_can_be_updated(): void
     {
         $user = User::factory()->create();

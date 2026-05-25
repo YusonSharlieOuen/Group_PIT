@@ -30,12 +30,16 @@ class ViewingController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        $properties = PropertyDetails::all();
-        $renters = Renter::all();
+        $properties = PropertyDetails::where('status', 'Available')
+            ->orderBy('city')
+            ->get();
+        $renter = $request->user()?->renter;
+        $renters = $renter ? collect([$renter]) : Renter::orderBy('last_name')->get();
+        $selectedPropertyId = $request->query('property_id');
 
-        return view('Viewing.create_viewing', compact('properties', 'renters'));
+        return view('Viewing.create_viewing', compact('properties', 'renters', 'renter', 'selectedPropertyId'));
     }
 
     /**
@@ -43,21 +47,23 @@ class ViewingController extends Controller
      */
     public function store(Request $request)
     {
+        $renter = $request->user()?->renter;
+
         $request->validate([
             'property_id' => 'required',
-            'renter_id' => 'required',
+            'renter_id' => $renter ? 'nullable' : 'required',
             'viewing_date' => 'required|date',
             'comments' => 'nullable|string',
         ]);
 
         Viewing::create([
             'property_id' => $request->property_id,
-            'renter_id' => $request->renter_id,
+            'renter_id' => $renter?->renter_id ?? $request->renter_id,
             'viewing_date' => $request->viewing_date,
             'comments' => $request->comments,
         ]);
 
-        return back()->with('success', 'Viewing added successfully.');
+        return back()->with('success', 'Viewing booked successfully.');
     }
 
     /**
@@ -113,4 +119,3 @@ class ViewingController extends Controller
         return redirect()->route('admin.viewings.index')->with('success', 'Viewing deleted successfully.');
     }
 }
-

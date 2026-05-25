@@ -57,6 +57,15 @@ class PropertyDetails extends Model
         );
     }
 
+    public function adverts()
+    {
+        return $this->hasMany(
+            Advert::class,
+            'property_id',
+            'property_id'
+        );
+    }
+
     /*
     PROPERTY HAS MANY LEASES
     */

@@ -10,7 +10,9 @@ use App\Http\Controllers\PropertyDetailsController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\ViewingController;
+use App\Models\Lease;
 use App\Models\PropertyDetails;
+use App\Models\Viewing;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -60,11 +62,40 @@ Route::get('/dashboard', function () {
         return redirect()->route('manager.dashboard');
     }
 
-    // Renters (and anyone else) see the featured listings dashboard
+    $renter = $user?->renter()->with('branch')->first();
 
-    $featuredProperties = PropertyDetails::take(3)->get();
+    $availableProperties = PropertyDetails::with(['branch', 'staff', 'adverts'])
+        ->where('status', 'Available')
+        ->orderBy('monthly_rent')
+        ->take(6)
+        ->get();
 
-    return view('dashboard', compact('featuredProperties'));
+    $myViewings = collect();
+    $activeLease = null;
+
+    if ($renter) {
+        $myViewings = Viewing::with(['propertyDetails.branch', 'propertyDetails.staff'])
+            ->where('renter_id', $renter->renter_id)
+            ->orderBy('viewing_date')
+            ->take(5)
+            ->get();
+
+        $activeLease = Lease::with(['property.branch', 'staff'])
+            ->where('renter_id', $renter->renter_id)
+            ->where(function ($query) {
+                $query->whereNull('end_date')
+                    ->orWhere('end_date', '>=', now()->toDateString());
+            })
+            ->orderByDesc('start_date')
+            ->first();
+    }
+
+    return view('dashboard', compact(
+        'renter',
+        'availableProperties',
+        'myViewings',
+        'activeLease'
+    ));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 
