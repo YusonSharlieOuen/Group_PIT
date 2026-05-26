@@ -14,9 +14,26 @@ class ManagerController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-    {
-        return view('manager.manager_dashboard');
-    }
+{
+    $branchId = auth()->user()->staff->branch_id;
+
+    $staffCount = Staff::where('branch_id', $branchId)->count();
+
+    $supervisorCount = Staff::where('branch_id', $branchId)
+        ->where('position', 'Supervisor')
+        ->count();
+
+    $staffMembers = Staff::where('branch_id', $branchId)
+        ->orderBy('staff_id', 'desc')
+        ->take(5)
+        ->get();
+
+    return view('manager.manager_dashboard', compact(
+        'staffCount',
+        'supervisorCount',
+        'staffMembers'
+    ));
+}
 
     /**
      * Show the form for creating a new resource.
