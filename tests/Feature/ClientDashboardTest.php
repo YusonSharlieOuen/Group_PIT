@@ -16,6 +16,20 @@ class ClientDashboardTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_client_without_renter_profile_still_sees_client_sidebar(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('Client Dashboard')
+            ->assertSee('Browse Properties')
+            ->assertSee('My Viewings')
+            ->assertSee('My Lease')
+            ->assertSee('Notifications');
+    }
+
     public function test_renter_dashboard_and_client_pages_render(): void
     {
         $user = User::factory()->create();

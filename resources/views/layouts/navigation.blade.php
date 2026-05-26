@@ -13,7 +13,10 @@
         }
     }
 
-    $isLinkedRenter = (bool) $user?->renter;
+    $userType = strtolower($user?->user_type ?? '');
+    $isManagementUser = in_array($userType, ['admin', 'manager', 'management', 'staff', 'supervisor'], true)
+        || $user?->hasRole(['Admin', 'Manager', 'Staff', 'Supervisor']);
+    $isClientUser = $user && ! $isManagementUser;
     $dashboardRoute = 'dashboard';
 
     if ($user?->hasRole('Admin')) {
@@ -24,7 +27,7 @@
 
     $navItems = [];
 
-    if ($user && $isLinkedRenter) {
+    if ($isClientUser) {
         $navItems = [
             ['label' => 'Dashboard', 'route' => 'dashboard', 'active' => request()->routeIs('dashboard')],
             ['label' => 'Browse Properties', 'href' => route('dashboard').'#browse-properties', 'active' => request()->routeIs('home.find')],
@@ -52,7 +55,7 @@
             ['label' => 'Create Staff', 'route' => 'manager.create', 'active' => request()->routeIs('manager.create')],
             ['label' => 'Create Lease', 'route' => 'lease.create', 'active' => request()->routeIs('lease.create')],
         ]);
-    } else {
+    } elseif (! $user) {
         $navItems = array_merge($navItems, [
             ['label' => 'Find a Home', 'route' => 'home.find', 'active' => request()->routeIs('home.find')],
             ['label' => 'List Property', 'route' => 'property.list', 'active' => request()->routeIs('property.list')],
@@ -175,16 +178,13 @@
     </div>
 
     @php
-        $userType = $user?->user_type;
-        $isAdminOrManagement = in_array(strtolower($userType ?? ''), ['admin', 'management'], true) || $user?->hasRole(['Admin','Manager']);
-        $isRenter = strtolower($userType ?? '') === 'renter' || $user?->hasRole('Renter');
+        $isAdminOrManagement = in_array($userType, ['admin', 'management'], true) || $user?->hasRole(['Admin','Manager']);
     @endphp
 
     <nav class="flex-1 space-y-1 px-3 py-5">
         @foreach ($navItems as $item)
             @continue(
-                ($isRenter && in_array($item['label'], ['Staff', 'Branches', 'Admin'], true)) ||
-                ($user && !$isRenter && in_array($item['label'], ['Find a Home', 'List Property', 'Services', 'About Us', 'Contact'], true))
+                $isClientUser && in_array($item['label'], ['Staff', 'Branches', 'Admin'], true)
             )
 
             <a href="{{ $item['href'] ?? ($item['route'] === 'dashboard' ? ($isAdminOrManagement ? route('admin.dashboard') : route('dashboard')) : route($item['route'])) }}"
