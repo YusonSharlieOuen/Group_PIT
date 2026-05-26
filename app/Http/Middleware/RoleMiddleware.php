@@ -30,14 +30,15 @@ class RoleMiddleware
             $allowed = array_map('strtolower', $allowed);
         }
 
-        $position = null;
-        if (method_exists($user, 'staff') && $user->staff) {
-            $position = strtolower($user->staff->position);
-        }
+        // This app uses `user_type` to classify users.
+        // Expected user_type values: 'staff' and 'renter'.
+        // Admin/manager/supervisor should all map to 'staff' in user_type.
+        $position = strtolower((string) ($user->user_type ?? ''));
 
         if (empty($allowed) || ! $position || ! in_array($position, $allowed, true)) {
             abort(Response::HTTP_FORBIDDEN, 'Unauthorized.');
         }
+
 
         return $next($request);
     }

@@ -52,12 +52,17 @@
 
         </div>
 
-        <!-- BOOKING GUI (Create Viewing) -->
+<!-- BOOKING GUI (Create Viewing) -->
+        @unless(auth()->user()?->hasRole('Renter'))
         <div class="mt-10 bg-white border border-gray-200 rounded-2xl shadow-md p-6">
+
+
+
 
             <h2 class="text-2xl font-bold text-gray-800 mb-1">
                 Book this property
             </h2>
+
             <p class="text-sm text-gray-600 mb-6">
                 Pick a renter and select a viewing date.
             </p>
@@ -75,32 +80,38 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                    <!-- RENTER -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Renter
-                        </label>
+                    <!-- RENTER (Staff/Admin/Manager only). Hidden for logged-in client (Renter). -->
+                    @if(!auth()->user() || !auth()->user()?->hasRole('Renter'))
 
-                        <select
-                            name="renter_id"
-                            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-[#5c9aa9] focus:border-[#5c9aa9]"
-                            required
-                        >
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Renter
+                            </label>
 
-                            <option value="">Select Renter</option>
+                            <select
+                                name="renter_id"
+                                class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-[#5c9aa9] focus:border-[#5c9aa9]"
+                                required
+                            >
 
-                            @foreach($renters as $renter)
+                                <option value="">Select Renter</option>
 
-                                <option value="{{ $renter->renter_id }}">
-                                    {{ $renter->first_name }}
-                                    {{ $renter->last_name }}
-                                    ({{ $renter->renter_id }})
-                                </option>
+                                @foreach($renters as $renter)
 
-                            @endforeach
+                                    <option value="{{ $renter->renter_id }}">
+                                        {{ $renter->first_name }}
+                                        {{ $renter->last_name }}
+                                        ({{ $renter->renter_id }})
+                                    </option>
 
-                        </select>
-                    </div>
+                                @endforeach
+
+                            </select>
+                        </div>
+                    @else
+                        {{-- Client booking: capture renter_id automatically --}}
+                        <input type="hidden" name="renter_id" value="{{ auth()->user()->renter?->renter_id ?? auth()->user()->id }}">
+                    @endif
 
                     <!-- DATE -->
                     <div>
@@ -133,6 +144,7 @@
                     ></textarea>
 
                 </div>
+
 
                 <div class="mt-6">
                     <button
@@ -196,5 +208,7 @@
     </div>
 
 </div>
+
+@endunless
 
 </x-app-layout> 

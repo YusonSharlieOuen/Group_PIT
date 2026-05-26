@@ -41,7 +41,7 @@
                     <label class="font-semibold text-gray-700">Lease ID</label>
                     <input type="text"
                            name="lease_id"
-                           value="{{ $leaseId }}"
+                           value="{{ $leaseId ?? '' }}"
                            readonly
                            class="w-full mt-1 p-2 border rounded-lg bg-gray-100">
                 </div>
@@ -53,6 +53,8 @@
                             class="w-full mt-1 p-2 border rounded-lg">
 
                         <option value="">-- Select Payment Method --</option>
+                        <option value="monthly" {{ old('payment_method') == 'monthly' ? 'selected' : '' }}>Monthly</option>
+                        <option value="yearly" {{ old('payment_method') == 'yearly' ? 'selected' : '' }}>Yearly</option>
 
                         <option value="monthly">Monthly</option>
                         <option value="yearly">Yearly</option>
@@ -70,12 +72,16 @@
                     <label class="font-semibold text-gray-700">Property</label>
 
                     <select name="property_id" id="property_id"
-                            class="w-full mt-1 p-2 border rounded-lg">
+                            class="w-full mt-1 p-2 border rounded-lg" required>
+
+
+
 
                         <option value="">-- Select Property --</option>
 
-                        @foreach($properties as $property)
+                        @foreach($properties ?? [] as $property)
                             <option value="{{ $property->property_id }}"
+                                    {{ old('property_id') == $property->property_id ? 'selected' : '' }}
                                     data-rent="{{ $property->monthly_rent }}">
                                 {{ $property->property_id }} - {{ $property->street }}
                             </option>
@@ -91,8 +97,10 @@
                     <select name="renter_id"
                             class="w-full mt-1 p-2 border rounded-lg">
 
-                        @foreach($renters as $renter)
+                        @foreach($renters ?? [] as $renter)
                             <option value="{{ $renter->renter_id }}">
+                            <option value="{{ $renter->renter_id }}"
+                                    {{ old('renter_id') == $renter->renter_id ? 'selected' : '' }}>
                                 {{ $renter->renter_id }} - {{ $renter->first_name }} {{ $renter->last_name }}
                             </option>
                         @endforeach
@@ -110,10 +118,11 @@
                     <label class="font-semibold text-gray-700">Staff</label>
 
                     <select name="staff_id"
-                            class="w-full mt-1 p-2 border rounded-lg">
+                            class="w-full mt-1 p-2 border rounded-lg" required>
 
-                        @foreach($staff as $member)
-                            <option value="{{ $member->staff_id }}">
+                        @foreach($staff ?? [] as $member)
+                            <option value="{{ $member->staff_id }}"
+                                    {{ old('staff_id') == $member->staff_id ? 'selected' : '' }}>
                                 {{ $member->staff_id }} - {{ $member->first_name }} {{ $member->last_name }}
                             </option>
                         @endforeach
@@ -143,6 +152,7 @@
                     <label class="font-semibold text-gray-700">Deposit</label>
                     <input type="number"
                            name="deposit"
+                           value="{{ old('deposit') }}"
                            class="w-full mt-1 p-2 border rounded-lg">
                 </div>
 
@@ -155,6 +165,8 @@
 
                         <option value="1">Yes</option>
                         <option value="0">No</option>
+                        <option value="1" {{ old('deposit_paid') == '1' ? 'selected' : '' }}>Yes</option>
+                        <option value="0" {{ old('deposit_paid') == '0' ? 'selected' : '' }}>No</option>
 
                     </select>
                 </div>
@@ -168,6 +180,7 @@
                     <label class="font-semibold text-gray-700">Start Date</label>
                     <input type="date"
                            name="start_date"
+                           value="{{ old('start_date') }}"
                            class="w-full mt-1 p-2 border rounded-lg">
                 </div>
 
@@ -175,6 +188,7 @@
                     <label class="font-semibold text-gray-700">End Date</label>
                     <input type="date"
                            name="end_date"
+                           value="{{ old('end_date') }}"
                            class="w-full mt-1 p-2 border rounded-lg">
                 </div>
 

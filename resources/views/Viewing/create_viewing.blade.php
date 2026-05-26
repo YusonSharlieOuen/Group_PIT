@@ -1,4 +1,15 @@
 <x-app-layout>
+
+@unless(auth()->user()?->hasRole('Admin') || auth()->user()?->hasRole('Manager'))
+
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800 font-semibold">
+            Unauthorized.
+        </div>
+    </div>
+    @php abort(403); @endphp
+@endunless
+
     <div class="bg-white min-h-screen pb-16">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
             <div class="bg-white border border-gray-200 rounded-2xl shadow-md p-6">

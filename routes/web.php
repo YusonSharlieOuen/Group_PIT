@@ -75,9 +75,20 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/user_profile', [UserProfileController::class, 'index'])->name('user_profile.index');
 
+    // Client (Renter) Information - read-only, only renter can view their own record
+    Route::get('/renter/information', [\App\Http\Controllers\RenterInformationController::class, 'show'])
+        ->name('renter.information')
+        ->middleware(['auth']);
+
+
     Route::get('/staff', [StaffController::class, 'index'])
         ->name('staff.index')
         ->middleware(\App\Http\Middleware\RoleMiddleware::class.':Admin,Manager');
+
+    // Staff management dashboard (modern UI)
+    Route::get('/staff/dashboard', function () {
+        return view('staff-dashboard');
+    })->name('staff.dashboard')->middleware(['auth']);
 
     // Admin dashboard
     Route::get('/admin', [\App\Http\Controllers\AdminController::class, 'index'])
@@ -96,7 +107,16 @@ Route::middleware('auth')->group(function () {
         ->name('Branch.index');
     Route::resource('branch', BranchController::class);
 
-    Route::get('/create_lease', [LeaseController::class, 'index'])->name('Lease.index');
+    // This provides the specific name 'lease.all' requested for your Admin Dashboard
+    Route::get('/admin/leases', [LeaseController::class, 'index'])->name('lease.all');
+
+    // Using names() ensures the store route matches the singular 'lease.store' used in your view
+    Route::resource('leases', LeaseController::class)->names([
+        'create' => 'lease.create',
+        'store' => 'lease.store',
+        'index' => 'lease.display_all_leases',
+    ]);
+
 
     //Manager dashboard
     Route::get('/Manager/manager_dashboard', [\App\Http\Controllers\ManagerController::class, 'index'])
@@ -134,21 +154,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/staff/{id}/next-of-kin', [StaffController::class, 'storeNextOfKin'])
         ->name('staff.nextofkin.store')
         ->middleware(\App\Http\Middleware\RoleMiddleware::class.':Admin');
-
-    // Lease Routes
-    Route::get('/leases', [LeaseController::class, 'display_all_leases'])
-        ->name('lease.all');
-
-    Route::get('/lease/create', [LeaseController::class, 'create'])
-        ->name('lease.create');
-
-    Route::post('/lease/store', [LeaseController::class, 'store'])
-        ->name('lease.store');
-
-    // Property Details Routes
-    Route::get('/property', [PropertyDetailsController::class, 'index'])
-        ->name('property.index');
-
     Route::get('/property/create', [PropertyDetailsController::class, 'create'])
         ->name('property.create')
         ->middleware(\App\Http\Middleware\RoleMiddleware::class.':Admin,Manager,Staff');
@@ -193,10 +198,13 @@ Route::middleware('auth')->group(function () {
     });
 
     // Admin Routes
-    Route::get('/admin/create-staff', [AdminController::class, 'create'])
-        ->name('admin.index');
-    Route::post('/admin/create-staff', [AdminController::class, 'store'])
-        ->name('admin.store');
+    Route::middleware(['auth', 'role:Admin'])->group(function () {
+        Route::get('/admin/create-staff', [AdminController::class, 'create'])
+            ->name('admin.index');
+        Route::post('/admin/create-staff', [AdminController::class, 'store'])
+            ->name('admin.store');
+    });
 });
+
 
 require __DIR__.'/auth.php';

@@ -1,7 +1,9 @@
 # TODO
 
-- [ ] Fix Eloquent model primary keys to avoid selecting a non-existent `id` column (Branch, Staff).
-- [ ] Ensure eager-loading/select constraints include the correct primary key columns (`branch_id`, `staff_id`).
-- [ ] Verify/patch any relationship or controller query that assumes `id` for Branch/Staff.
-- [ ] Run a quick smoke test for the route that triggers SQLSTATE[42703].
+- [x] Rewrite `resources/views/staff-dashboard.blade.php` into modern “Staff Management Dashboard” UI using Tailwind + Blade with safe placeholders.
+- [ ] After UI rewrite, ensure routing/controller passes the necessary collections (clients, properties, leases, viewings, inspections).
+- [ ] Optionally add/adjust modal forms + calendar/timeline UI interactions.
+- [x] Create client-only “Client/Renter Information” page (read-only) + access control.
+
+
 

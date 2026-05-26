@@ -18,9 +18,10 @@
                     <a href="{{ route('home.find') }}" class="inline-flex items-center rounded-md bg-white px-5 py-3 text-sm font-semibold uppercase tracking-wider text-gray-950 shadow-sm transition hover:bg-gray-100">
                         View Listings
                     </a>
-                    <a href="{{ route('property.index') }}" class="inline-flex items-center rounded-md border border-white/50 px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white transition hover:bg-white/10">
+                    <a href="{{ route('property.create') }}" class="inline-flex items-center rounded-md border border-white/50 px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white transition hover:bg-white/10">
                         Manage Properties
-                    </a>
+                </a>
+
                 </div>
             </div>
         </div>
@@ -33,18 +34,19 @@
                     <p class="text-xs font-semibold uppercase tracking-widest text-gray-500">Search</p>
                     <p class="mt-2 text-lg font-semibold text-gray-950">Find a Home</p>
                 </a>
-                <a href="{{ route('property.index') }}" class="rounded-md border border-gray-100 p-4 transition hover:border-gray-300 hover:bg-gray-50">
+                <a href="{{ route('property.create') }}" class="rounded-md border border-gray-100 p-4 transition hover:border-gray-300 hover:bg-gray-50">
                     <p class="text-xs font-semibold uppercase tracking-widest text-gray-500">Portfolio</p>
+
                     <p class="mt-2 text-lg font-semibold text-gray-950">Properties</p>
                 </a>
-                <a href="{{ route('lease.all') }}" class="rounded-md border border-gray-100 p-4 transition hover:border-gray-300 hover:bg-gray-50">
-                    <p class="text-xs font-semibold uppercase tracking-widest text-gray-500">Records</p>
-                    <p class="mt-2 text-lg font-semibold text-gray-950">Leases</p>
-                </a>
-                <a href="{{ route('viewing.create') }}" class="rounded-md border border-gray-100 p-4 transition hover:border-gray-300 hover:bg-gray-50">
-                    <p class="text-xs font-semibold uppercase tracking-widest text-gray-500">Schedule</p>
-                    <p class="mt-2 text-lg font-semibold text-gray-950">Book Viewing</p>
-                </a>
+
+                @if(!auth()->user() || (!auth()->user()?->hasRole('Renter')))
+                    <a href="{{ route('viewing.create') }}" class="rounded-md border border-gray-100 p-4 transition hover:border-gray-300 hover:bg-gray-50">
+                        <p class="text-xs font-semibold uppercase tracking-widest text-gray-500">Schedule</p>
+                        <p class="mt-2 text-lg font-semibold text-gray-950">Book Viewing</p>
+                    </a>
+                @endif
+
             </div>
         </div>
     </section>
