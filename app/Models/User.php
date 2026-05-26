@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Staff;
+use App\Models\Renter;
 
 class User extends Authenticatable
 {
@@ -55,6 +56,11 @@ class User extends Authenticatable
     public function staff()
     {
         return $this->hasOne(Staff::class, 'user_id', 'id');
+    }
+
+    public function renter()
+    {
+        return $this->hasOne(Renter::class, 'user_id', 'id');
     }
 
     /**

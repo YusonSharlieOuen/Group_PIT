@@ -28,4 +28,24 @@ class Renter extends Model
         'branch_id',
         'user_id',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class, 'branch_id', 'branch_id');
+    }
+
+    public function viewings()
+    {
+        return $this->hasMany(Viewing::class, 'renter_id', 'renter_id');
+    }
+
+    public function leases()
+    {
+        return $this->hasMany(Lease::class, 'renter_id', 'renter_id');
+    }
 }

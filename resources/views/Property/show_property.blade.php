@@ -1,27 +1,12 @@
 <x-app-layout>
-
-<div class="bg-white min-h-screen pb-16">
-
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-
-        <!-- PROPERTY CARD -->
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-
-            <div class="bg-[#5c9aa9] text-white p-6">
-                <h1 class="text-3xl font-bold tracking-wide">
-                    Property {{ $property->property_id }}
-                </h1>
-                <p class="text-sm opacity-90">
-                    {{ $property->street }}, {{ $property->city }}
-                </p>
-            </div>
-
-            @if($property->photo_path)
-                <img src="{{ asset('storage/'.$property->photo_path) }}"
+    <div class="min-h-screen bg-gray-50 py-10">
+        <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+                <img src="{{ $property->photo_path ? asset('storage/'.$property->photo_path) : asset('images/house1.jpg') }}"
                      class="h-80 w-full object-cover"
                      alt="Property {{ $property->property_id }}">
-            @endif
 
+<<<<<<< HEAD
             <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700">
 
                 <div>
@@ -195,20 +180,142 @@
                                 <strong>Comments:</strong> {{ $viewing->comments }}
                             </p>
 
+=======
+                <div class="p-6 sm:p-8">
+                    <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-widest text-[#5c9aa9]">Property Details</p>
+                            <h1 class="mt-2 font-serif text-4xl font-semibold text-gray-950">
+                                {{ $property->street ?? 'Rental Property' }}
+                            </h1>
+                            <p class="mt-2 text-sm text-gray-600">
+                                {{ $property->area }}, {{ $property->city }} {{ $property->postcode }}
+                            </p>
+                        </div>
+                        <div class="rounded-md bg-gray-50 px-4 py-3 text-right">
+                            <p class="text-xs font-semibold uppercase tracking-widest text-gray-500">Monthly Rent</p>
+                            <p class="mt-1 text-2xl font-bold text-gray-950">PHP {{ number_format($property->monthly_rent ?? 0) }}</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 grid gap-6 lg:grid-cols-3">
+                        <div class="rounded-lg border border-gray-200 p-5 lg:col-span-2">
+                            <h2 class="font-serif text-2xl font-semibold text-gray-950">Home Information</h2>
+                            <dl class="mt-5 grid gap-4 sm:grid-cols-2">
+                                <div>
+                                    <dt class="text-xs font-semibold uppercase tracking-widest text-gray-500">Property ID</dt>
+                                    <dd class="mt-1 text-sm font-medium text-gray-950">{{ $property->property_id }}</dd>
+                                </div>
+                                <div>
+                                    <dt class="text-xs font-semibold uppercase tracking-widest text-gray-500">Status</dt>
+                                    <dd class="mt-1">
+                                        <span class="rounded-full px-3 py-1 text-xs font-semibold text-white {{ $property->status === 'Available' ? 'bg-green-600' : 'bg-red-600' }}">
+                                            {{ $property->status }}
+                                        </span>
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt class="text-xs font-semibold uppercase tracking-widest text-gray-500">Property Type</dt>
+                                    <dd class="mt-1 text-sm font-medium text-gray-950">{{ $property->property_type ?? 'N/A' }}</dd>
+                                </div>
+                                <div>
+                                    <dt class="text-xs font-semibold uppercase tracking-widest text-gray-500">Rooms</dt>
+                                    <dd class="mt-1 text-sm font-medium text-gray-950">{{ $property->number_of_rooms ?? 'N/A' }}</dd>
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <dt class="text-xs font-semibold uppercase tracking-widest text-gray-500">Full Address</dt>
+                                    <dd class="mt-1 text-sm font-medium text-gray-950">
+                                        {{ $property->street }}, {{ $property->area }}, {{ $property->city }}, {{ $property->postcode }}
+                                    </dd>
+                                </div>
+                            </dl>
+>>>>>>> 4d8fd99ccfa23617e6d133e307f9932fcfbcb2b4
                         </div>
 
-                    @endforeach
+                        <div class="rounded-lg border border-gray-200 p-5">
+                            <h2 class="font-serif text-2xl font-semibold text-gray-950">Branch and Agent</h2>
+                            <div class="mt-5 space-y-4 text-sm text-gray-700">
+                                <div>
+                                    <p class="text-xs font-semibold uppercase tracking-widest text-gray-500">Branch</p>
+                                    <p class="mt-1 font-medium text-gray-950">{{ $property->branch?->city ?? 'N/A' }}</p>
+                                    <p>{{ $property->branch?->telephone ?? 'No telephone listed' }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-semibold uppercase tracking-widest text-gray-500">Assigned Staff</p>
+                                    <p class="mt-1 font-medium text-gray-950">
+                                        {{ $property->staff ? $property->staff->first_name.' '.$property->staff->last_name : 'N/A' }}
+                                    </p>
+                                    <p>{{ $property->staff?->phone ?? 'No phone listed' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
+                    <div class="mt-6 rounded-lg border border-gray-200 p-5">
+                        <h2 class="font-serif text-2xl font-semibold text-gray-950">Advertisement Details</h2>
+                        @if($property->adverts->isNotEmpty())
+                            <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                                @foreach($property->adverts as $advert)
+                                    <div class="rounded-md bg-gray-50 p-4 text-sm text-gray-700">
+                                        <p class="font-semibold text-gray-950">{{ $advert->newspaper ?? 'Advertisement' }}</p>
+                                        <p class="mt-1">Advertised: {{ $advert->date_advertised ?? 'Date not set' }}</p>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="mt-3 text-sm text-gray-600">No advertisement records are attached to this property.</p>
+                        @endif
+                    </div>
+
+                    <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+                        <a href="{{ route('viewing.create', ['property_id' => $property->property_id]) }}" class="rounded-md bg-[#5c9aa9] px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-[#4a8796]">
+                            Schedule Viewing
+                        </a>
+                        <a href="{{ route('dashboard') }}#browse-properties" class="rounded-md border border-gray-300 px-5 py-3 text-center text-sm font-semibold text-gray-900 transition hover:bg-gray-50">
+                            Back to Client Dashboard
+                        </a>
+                    </div>
                 </div>
+            </div>
 
-            @endif
-
+            <div class="mt-8 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                <h2 class="font-serif text-2xl font-semibold text-gray-950">My Viewing Requests for This Property</h2>
+                <div class="mt-5 overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="border-b border-gray-200 text-xs uppercase tracking-widest text-gray-500">
+                            <tr>
+                                <th class="py-3 pr-4">Viewing Date</th>
+                                <th class="py-3 pr-4">Comments</th>
+                                <th class="py-3">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @forelse($viewings as $viewing)
+                                <tr>
+                                    <td class="py-3 pr-4 text-gray-900">{{ $viewing->viewing_date }}</td>
+                                    <td class="py-3 pr-4 text-gray-700">{{ $viewing->comments ?? 'No comments' }}</td>
+                                    <td class="py-3">
+                                        <span class="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">Pending</span>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="3" class="py-5 text-center text-gray-600">You have not booked a viewing for this property.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-
     </div>
+<<<<<<< HEAD
 
 </div>
 
 @endunless
 
 </x-app-layout> 
+=======
+</x-app-layout>
+>>>>>>> 4d8fd99ccfa23617e6d133e307f9932fcfbcb2b4

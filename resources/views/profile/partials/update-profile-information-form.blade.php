@@ -1,4 +1,19 @@
 <section>
+    @php
+        $profilePhotoUrl = null;
+
+        if ($user->profile_photo_path) {
+            $isExternalPhoto = str_starts_with($user->profile_photo_path, 'http://')
+                || str_starts_with($user->profile_photo_path, 'https://');
+
+            if ($isExternalPhoto) {
+                $profilePhotoUrl = $user->profile_photo_path;
+            } elseif (Storage::disk('public')->exists($user->profile_photo_path)) {
+                $profilePhotoUrl = Storage::disk('public')->url($user->profile_photo_path);
+            }
+        }
+    @endphp
+
     <header>
         <h2 class="text-lg font-medium text-gray-900">
             {{ __('Profile Information') }}
@@ -21,8 +36,8 @@
             <x-input-label for="profile_photo" :value="__('Profile Photo')" />
 
             <div class="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center">
-                @if ($user->profile_photo_path)
-                    <img src="{{ asset('storage/'.$user->profile_photo_path) }}"
+                @if ($profilePhotoUrl)
+                    <img src="{{ $profilePhotoUrl }}"
                          class="h-24 w-24 rounded-full border-4 border-white object-cover shadow"
                          alt="{{ $user->name }}">
                 @else
