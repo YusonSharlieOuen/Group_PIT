@@ -17,28 +17,38 @@ class RoleMiddleware
      * @param  string|null  $roles
      */
     public function handle(Request $request, Closure $next, ?string $roles = null)
-    {
-        $user = $request->user();
+{
+    $user = $request->user();
 
-        if (! $user) {
-            abort(Response::HTTP_FORBIDDEN);
-        }
+    if (! $user) {
+        abort(Response::HTTP_FORBIDDEN);
+    }
 
-        $allowed = [];
-        if ($roles) {
-            $allowed = array_map('trim', explode(',', $roles));
-            $allowed = array_map('strtolower', $allowed);
-        }
+    $allowed = [];
 
-        $position = null;
-        if (method_exists($user, 'staff') && $user->staff) {
-            $position = strtolower($user->staff->position);
-        }
+    if ($roles) {
+        $allowed = array_map('trim', explode(',', $roles));
+        $allowed = array_map('strtolower', $allowed);
+    }
 
-        if (empty($allowed) || ! $position || ! in_array($position, $allowed, true)) {
-            abort(Response::HTTP_FORBIDDEN, 'Unauthorized.');
-        }
+    // CHECK user_type FIRST
+    $userType = strtolower($user->user_type ?? '');
 
+    if (in_array($userType, $allowed, true)) {
         return $next($request);
     }
+
+    // OPTIONAL fallback to staff position
+    $position = null;
+
+    if (method_exists($user, 'staff') && $user->staff) {
+        $position = strtolower($user->staff->position);
+    }
+
+    if ($position && in_array($position, $allowed, true)) {
+        return $next($request);
+    }
+
+    abort(Response::HTTP_FORBIDDEN, 'Unauthorized.');
+}
 }

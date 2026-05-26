@@ -221,6 +221,11 @@ Route::middleware('auth')->group(function () {
         ->name('manager.create');
     Route::post('/manager/create-staff', [ManagerController::class, 'store'])
         ->name('manager.store');
+
+    Route::get('/manager/staff', [ManagerController::class, 'staffIndex'])
+        ->name('manager.staff.index');
+    Route::get('/manager/staff{id}', [ManagerController::class, 'showStaff'])
+        ->name('manager.staff.show');
     });
 
     // Admin Routes

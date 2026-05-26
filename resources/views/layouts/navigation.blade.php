@@ -51,7 +51,7 @@
         ]);
     } elseif ($user?->hasRole('Manager')) {
         $navItems = array_merge($navItems, [
-            ['label' => 'Staff', 'route' => 'staff.index', 'active' => request()->routeIs('staff.*')],
+            ['label' => 'Staff', 'route' => 'manager.staff.index', 'active' => request()->routeIs('manager.staff.*')],
             ['label' => 'Create Staff', 'route' => 'manager.create', 'active' => request()->routeIs('manager.create')],
             ['label' => 'Create Lease', 'route' => 'lease.create', 'active' => request()->routeIs('lease.create')],
         ]);

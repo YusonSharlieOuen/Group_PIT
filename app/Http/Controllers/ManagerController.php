@@ -132,6 +132,27 @@ class ManagerController extends Controller
     {
         //
     }
+    public function showStaff($id)
+    {
+        $staff = Staff::with([
+            'branch',
+            'supervisor',
+            'subordinates',
+            'nextOfKin',
+            'assignedProperties'
+        ])->findOrFail($id);
+
+        return view('manager.staff-details', compact('staff'));
+    }
+
+    public function staffIndex()
+{
+    $staffs = Staff::with('branch')
+        ->where('branch_id', auth()->user()->branch_id)
+        ->paginate(10);
+
+    return view('manager.staff-view', compact('staffs'));
+}
 
     /**
      * Show the form for editing the specified resource.
