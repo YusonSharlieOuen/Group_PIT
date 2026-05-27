@@ -14,56 +14,141 @@
     }
 
     $userType = strtolower($user?->user_type ?? '');
-    $isManagementUser = in_array($userType, ['admin', 'manager', 'management', 'staff', 'supervisor'], true)
-        || $user?->hasRole(['Admin', 'Manager', 'Staff', 'Supervisor']);
+    $isManagementUser = in_array(
+        $userType,
+        ['admin', 'manager', 'staff', 'supervisor'],
+        true
+    );
     $isClientUser = $user && ! $isManagementUser;
     $dashboardRoute = 'dashboard';
 
-    if ($user?->hasRole('Admin')) {
+    if ($userType === 'admin') {
         $dashboardRoute = 'admin.dashboard';
-    } elseif ($user?->hasRole('Manager') || strtolower($userType ?? '') === 'manager') {
+    } elseif ($userType === 'manager') {
         $dashboardRoute = 'manager.dashboard';
     }
 
     $navItems = [];
 
-    if ($isClientUser) {
+if ($user) {
+
+    /*
+    |--------------------------------------------------------------------------
+    | ADMIN
+    |--------------------------------------------------------------------------
+    */
+
+    if ($userType === 'admin') {
+
         $navItems = [
-            ['label' => 'Dashboard', 'route' => 'dashboard', 'active' => request()->routeIs('dashboard')],
-            ['label' => 'Browse Properties', 'href' => route('dashboard').'#browse-properties', 'active' => request()->routeIs('home.find')],
-            ['label' => 'My Viewings', 'href' => route('dashboard').'#my-viewings', 'active' => request()->routeIs('viewing.create')],
-            ['label' => 'My Lease', 'href' => route('dashboard').'#my-lease', 'active' => false],
-            ['label' => 'Profile', 'route' => 'profile.edit', 'active' => request()->routeIs('profile.edit')],
-            ['label' => 'Notifications', 'href' => route('dashboard').'#notifications', 'active' => false],
-        ];
-    } elseif ($user) {
-        $navItems = [
-            ['label' => 'Dashboard', 'route' => $dashboardRoute, 'active' => request()->routeIs('dashboard') || request()->routeIs('admin.dashboard') || request()->routeIs('manager.dashboard')],
+
+            ['label' => 'Dashboard', 'route' => 'admin.dashboard', 'active' => request()->routeIs('admin.dashboard')],
+
+            ['label' => 'Staff', 'route' => 'staff.index', 'active' => request()->routeIs('staff.*')],
+
+            ['label' => 'Branches', 'route' => 'branch.index', 'active' => request()->routeIs('branch.*')],
+
+            ['label' => 'Properties', 'route' => 'property.index', 'active' => request()->routeIs('property.*')],
+
+            ['label' => 'Leases', 'route' => 'lease.display_all_leases', 'active' => request()->routeIs('lease.*')],
+
+            ['label' => 'Viewings', 'route' => 'admin.viewings.index', 'active' => request()->routeIs('admin.viewings.*')],
+
             ['label' => 'Profile', 'route' => 'profile.edit', 'active' => request()->routeIs('profile.edit')],
         ];
     }
 
-    if ($user?->hasRole('Admin')) {
-        $navItems = array_merge($navItems, [
-            ['label' => 'Staff', 'route' => 'staff.index', 'active' => request()->routeIs('staff.*')],
-            ['label' => 'Branches', 'route' => 'branch.index', 'active' => request()->routeIs('branch.*')],
-            ['label' => 'Admin', 'route' => 'admin.dashboard', 'active' => request()->routeIs('admin*')],
-        ]);
-    } elseif ($user?->hasRole('Manager') || strtolower($userType ?? '') === 'manager') {
-        $navItems = array_merge($navItems, [
+    /*
+    |--------------------------------------------------------------------------
+    | MANAGER
+    |--------------------------------------------------------------------------
+    */
+
+    elseif ($userType === 'manager') {
+
+        $navItems = [
+
+            ['label' => 'Dashboard', 'route' => 'manager.dashboard', 'active' => request()->routeIs('manager.dashboard')],
+
             ['label' => 'Staff', 'route' => 'manager.staff.index', 'active' => request()->routeIs('manager.staff.*')],
+
             ['label' => 'Create Staff', 'route' => 'manager.create', 'active' => request()->routeIs('manager.create')],
+
+            ['label' => 'Properties', 'route' => 'property.index', 'active' => request()->routeIs('property.*')],
+
             ['label' => 'Create Lease', 'route' => 'lease.create', 'active' => request()->routeIs('lease.create')],
-        ]);
-    } elseif (! $user) {
-        $navItems = array_merge($navItems, [
-            ['label' => 'Find a Home', 'route' => 'home.find', 'active' => request()->routeIs('home.find')],
-            ['label' => 'List Property', 'route' => 'property.list', 'active' => request()->routeIs('property.list')],
-            ['label' => 'Services', 'route' => 'services', 'active' => request()->routeIs('services')],
-            ['label' => 'About Us', 'route' => 'about', 'active' => request()->routeIs('about')],
-            ['label' => 'Contact', 'route' => 'contact', 'active' => request()->routeIs('contact')],
-        ]);
+
+            ['label' => 'Rent Requests', 'route' => 'staff.requests', 'active' => request()->routeIs('staff.requests')],
+
+            ['label' => 'Assign Rent Requests', 'route' => 'manager.rent.requests', 'active' => request()->routeIs('manager.rent.requests')],
+
+            ['label' => 'Profile', 'route' => 'profile.edit', 'active' => request()->routeIs('profile.edit')],
+        ];
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | STAFF / SUPERVISOR
+    |--------------------------------------------------------------------------
+    */
+
+    elseif (in_array($userType, ['staff', 'supervisor'])) {
+
+        $navItems = [
+
+            ['label' => 'Dashboard', 'route' => 'staff.dashboard', 'active' => request()->routeIs('staff.dashboard')],
+
+            ['label' => 'Properties', 'route' => 'property.index', 'active' => request()->routeIs('property.*')],
+
+            ['label' => 'Leases', 'route' => 'lease.display_all_leases', 'active' => request()->routeIs('lease.*')],
+
+            ['label' => 'Rent Requests', 'route' => 'staff.requests', 'active' => request()->routeIs('staff.requests')],
+
+            ['label' => 'Viewings', 'route' => 'admin.viewings.index', 'active' => request()->routeIs('admin.viewings.*')],
+
+            ['label' => 'Profile', 'route' => 'profile.edit', 'active' => request()->routeIs('profile.edit')],
+        ];
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | RENTER
+    |--------------------------------------------------------------------------
+    */
+
+    else {
+
+        $navItems = [
+
+            ['label' => 'Dashboard', 'route' => 'dashboard', 'active' => request()->routeIs('dashboard')],
+
+            ['label' => 'Properties', 'route' => 'property.index', 'active' => request()->routeIs('property.*')],
+
+            ['label' => 'My Rent Requests', 'route' => 'rent.requests.my', 'active' => request()->routeIs('rent.requests.my')],
+
+            ['label' => 'My Viewings', 'route' => 'viewing.create', 'active' => request()->routeIs('viewing.create')],
+
+            ['label' => 'My Lease', 'route' => 'dashboard', 'active' => false],
+
+            ['label' => 'Profile', 'route' => 'profile.edit', 'active' => request()->routeIs('profile.edit')],
+        ];
+    }
+
+} else {
+
+    $navItems = [
+
+        ['label' => 'Find a Home', 'route' => 'home.find', 'active' => request()->routeIs('home.find')],
+
+        ['label' => 'List Property', 'route' => 'property.list', 'active' => request()->routeIs('property.list')],
+
+        ['label' => 'Services', 'route' => 'services', 'active' => request()->routeIs('services')],
+
+        ['label' => 'About Us', 'route' => 'about', 'active' => request()->routeIs('about')],
+
+        ['label' => 'Contact', 'route' => 'contact', 'active' => request()->routeIs('contact')],
+    ];
+}
 @endphp
 
 <button
@@ -94,7 +179,11 @@
     <div class="flex h-16 items-center gap-3 border-b border-gray-100 px-4" :class="sidebarOpen ? 'justify-between' : 'justify-center'">
         @php
             $userType = $user?->user_type;
-            $isAdminOrManagement = in_array(strtolower($userType ?? ''), ['admin', 'management'], true) || $user?->hasRole(['Admin','Manager']);
+            $isAdminOrManagement = in_array(
+                strtolower($userType ?? ''),
+                ['admin', 'manager'],
+                true
+            );
             $homeRoute = $user ? ($isAdminOrManagement ? route('admin.dashboard') : route('dashboard')) : route('home.find');
         @endphp
         <a href="{{ $homeRoute }}" class="flex items-center gap-3 overflow-hidden">

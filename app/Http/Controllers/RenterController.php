@@ -15,7 +15,7 @@ class RenterController extends Controller
         $renter = Renter::where('user_id', auth()->id())->first();
 
         return view('profile.edit', [
-            'user' => $$request->user(),
+            'user' => request()->user(),
             'renter' => $renter,
         ]);
     }

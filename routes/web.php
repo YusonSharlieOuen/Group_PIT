@@ -10,6 +10,8 @@ use App\Http\Controllers\PropertyDetailsController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\ViewingController;
+use App\Http\Controllers\RentRequestController;
+use App\Http\Middleware\RoleMiddleware;
 use App\Models\Lease;
 use App\Models\PropertyDetails;
 use App\Models\Viewing;
@@ -20,7 +22,6 @@ use Illuminate\Support\Facades\Route;
 | Web Routes
 |--------------------------------------------------------------------------
 */
-
 Route::get('/', function () {
     return view('welcome');
 });
@@ -98,6 +99,23 @@ Route::get('/dashboard', function () {
     ));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::get('/test/staff-rent-requests', [RentRequestController::class, 'staffRequestsTest'])
+    ->middleware('auth')
+    ->name('staff.requests.test');
+
+Route::middleware(['auth', 'role:Staff'])
+    ->group(function () {
+        Route::get('/staff/rent-requests', [RentRequestController::class, 'staffRequests'])
+            ->name('staff.requests');
+    });
+
+Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':Manager'])
+    ->group(function () {
+
+        Route::get('/manager/rent-requests', [RentRequestController::class, 'managerRequests'])
+            ->name('manager.rent.requests');
+
+    });
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -249,7 +267,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/manager/staff', [ManagerController::class, 'staffIndex'])
         ->name('manager.staff.index');
-    Route::get('/manager/staff{id}', [ManagerController::class, 'showStaff'])
+    Route::get('/manager/staff/{id}', [ManagerController::class, 'showStaff'])
         ->name('manager.staff.show');
     });
 
@@ -260,6 +278,28 @@ Route::middleware('auth')->group(function () {
         Route::post('/admin/create-staff', [AdminController::class, 'store'])
             ->name('admin.store');
     });
+
+    //Other Routes
+    Route::post('/rent-request/{propertyId}', [RentRequestController::class, 'store'])
+        ->middleware('auth')
+        ->name('rent-request.store');
+
+    Route::get('/my-rent-requests', [RentRequestController::class, 'myRequests'])
+        ->middleware('auth')
+        ->name('rent.requests.my');
+
+    Route::post('/rent-request/{rentRequest}/assign', [RentRequestController::class, 'assign'])
+        ->middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':Manager'])
+        ->name('rent.request.assign');
+
+    Route::post('/rent-request/{rentRequest}/accept',
+        [RentRequestController::class, 'accept'])
+        ->name('rent.request.accept');
+
+    Route::post('/staff/rent-requests/{rentRequest}/approve', [RentRequestController::class, 'staffApprove'])
+    ->middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':Staff'])
+    ->name('staff.rent.approve');
+
 });
 
 

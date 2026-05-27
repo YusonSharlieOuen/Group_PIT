@@ -71,7 +71,6 @@ class ManagerController extends Controller
 
     if ($position === 'Supervisor') {
 
-        // Get latest supervisor
         $latestSupervisor = Staff::where('staff_id', 'like', 'SPV%')
             ->orderByDesc('staff_id')
             ->first();
@@ -85,7 +84,6 @@ class ManagerController extends Controller
 
     } else {
 
-        // Secretary + Staff use S
         $latestStaff = Staff::where('staff_id', 'like', 'S%')
             ->where('staff_id', 'not like', 'SPV%')
             ->orderByDesc('staff_id')
@@ -101,12 +99,35 @@ class ManagerController extends Controller
 
     /*
     |--------------------------------------------------------------------------
+    | Create User FIRST
+    |--------------------------------------------------------------------------
+    */
+
+    $user = null;
+
+    if ($request->filled('email') && $request->filled('password')) {
+
+        $user = User::create([
+            'name' => $request->first_name . ' ' . $request->last_name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+
+            'user_type' => strtolower($request->position),
+        ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Create Staff
     |--------------------------------------------------------------------------
     */
 
     Staff::create([
         'staff_id' => $staffId,
+
+        // THIS FIXES THE RELATION
+        'user_id' => $user?->id,
+
         'position' => $request->position,
         'first_name' => $request->first_name,
         'last_name' => $request->last_name,
@@ -116,29 +137,16 @@ class ManagerController extends Controller
         'date_joined' => $request->date_joined,
         'nin' => $request->nin,
         'salary' => $request->salary,
-        'branch_id' => auth()->user()->branch_id,
+
+        // IMPORTANT FIX
+        'branch_id' => auth()->user()->staff->branch_id,
+
         'supervisor_id' => $request->supervisor_id,
         'address' => $request->address,
     ]);
 
-    if ($request->filled('email') && $request->filled('password')) {
-
-    User::create([
-        'name' => $request->first_name . ' ' . $request->last_name,
-        'email' => $request->email,
-        'password' => Hash::make($request->password),
-
-        // your role system
-        'user_type' => strtolower($request->position),
-
-        // optional relation
-        'staff_id' => $staffId,
-        'branch_id' => auth()->user()->branch_id,
-    ]);
-    }
-
     return redirect()
-        ->route('staff.index')
+        ->route('manager.staff.index')
         ->with('success', 'Staff created successfully.');
 }
 
@@ -163,13 +171,13 @@ class ManagerController extends Controller
     }
 
     public function staffIndex()
-{
-    $staffs = Staff::with('branch')
-        ->where('branch_id', auth()->user()->branch_id)
-        ->paginate(10);
+    {
+        $staffs = Staff::with('branch')
+            ->where('branch_id', auth()->user()->branch_id)
+            ->paginate(10);
 
-    return view('manager.staff-view', compact('staffs'));
-}
+        return view('manager.staff-view', compact('staffs'));
+    }
 
     /**
      * Show the form for editing the specified resource.

@@ -23,14 +23,35 @@
                     @csrf
 
                     <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
-                        <div>
-                            <label for="staff_id" class="block text-sm font-medium text-gray-700">Staff ID</label>
-                            <input id="staff_id" name="staff_id" type="text" value="{{ old('staff_id') }}" maxlength="10" class="mt-1 w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900" required>
-                        </div>
 
                         <div>
-                            <label for="position" class="block text-sm font-medium text-gray-700">Position</label>
-                            <input id="position" name="position" type="text" value="{{ old('position') }}" maxlength="20" placeholder="Manager, Supervisor, Staff" class="mt-1 w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900" required>
+                            <label for="position" class="block text-sm font-medium text-gray-700">
+                                Position
+                            </label>
+
+                            <select id="position"
+                                    name="position"
+                                    class="mt-1 w-full rounded-md border border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900"
+                                    required>
+
+                                <option value="">Select Position</option>
+
+                                <option value="Manager"
+                                    @selected(old('position') === 'Manager')>
+                                    Manager
+                                </option>
+
+                                <option value="Supervisor"
+                                    @selected(old('position') === 'Supervisor')>
+                                    Supervisor
+                                </option>
+
+                                <option value="Staff"
+                                    @selected(old('position') === 'Staff')>
+                                    Staff
+                                </option>
+
+                            </select>
                         </div>
 
                         <div>

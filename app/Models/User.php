@@ -24,6 +24,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'user_type',
         'profile_photo_path',
     ];
 
@@ -86,5 +87,10 @@ class User extends Authenticatable
         }
 
         return false;
+    }
+
+    public function isRenter()
+    {
+        return strtolower($this->user_type) === 'renter';
     }
 }

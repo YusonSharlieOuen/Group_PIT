@@ -37,7 +37,7 @@ class AuthenticatedSessionController extends Controller
         }
 
         if ($userType === 'renter') {
-            return redirect()->route('renter.dashboard');
+            return redirect()->route('dashboard');
         }
 
         return redirect()->intended(route('dashboard', absolute: false));

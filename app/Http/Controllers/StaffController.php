@@ -9,6 +9,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 
 class StaffController extends Controller
@@ -46,6 +48,8 @@ class StaffController extends Controller
         return $prefix . $nextNum;
     }
 
+    
+
     public function index()
     {
         $staffs = Staff::with([
@@ -69,55 +73,133 @@ class StaffController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'first_name' => ['required', 'string', 'max:50'],
-            'last_name' => ['required', 'string', 'max:50'],
-            'position' => ['required', 'string', 'max:20'],
-        ]);
+{
+    $request->validate([
+        'first_name' => ['required', 'string', 'max:50'],
+        'last_name' => ['required', 'string', 'max:50'],
+        'position' => ['required', Rule::in(['Manager', 'Supervisor', 'Staff'])],
 
-        $staffId = $request->input('staff_id') ?? $request->input('staff_no');
+        // Optional login account
+        'email' => ['nullable', 'email', 'unique:users,email'],
+        'password' => ['nullable', 'confirmed', 'min:6'],
+    ]);
 
-        if (empty($staffId)) {
-            return back()->withErrors(['staff_id' => 'The Staff ID field is required.'])->withInput();
+    DB::beginTransaction();
+
+    try {
+
+        /*
+        |--------------------------------------------------------------------------
+        | Generate Staff ID Based on Position
+        |--------------------------------------------------------------------------
+        */
+
+        $position = $request->position;
+
+        $prefix = match ($position) {
+            'Manager' => 'M',
+            'Supervisor' => 'SPV',
+            default => 'S',
+        };
+
+        $latestStaff = Staff::where('staff_id', 'LIKE', $prefix . '%')
+            ->orderByRaw("CAST(REGEXP_SUBSTR(staff_id, '[0-9]+') AS INTEGER) DESC")
+            ->first();
+
+        $nextNumber = 1;
+
+        if ($latestStaff) {
+            preg_match('/([0-9]+)$/', $latestStaff->staff_id, $matches);
+
+            if (isset($matches[1])) {
+                $nextNumber = (int) $matches[1] + 1;
+            }
         }
 
-        if (Staff::where('staff_id', $staffId)->exists()) {
-            return back()->withErrors(['staff_id' => 'The staff ID has already been taken.'])->withInput();
+        $staffId = $prefix . $nextNumber;
+
+        /*
+        |--------------------------------------------------------------------------
+        | Create User Account (Optional)
+        |--------------------------------------------------------------------------
+        */
+
+        $user = null;
+
+        if ($request->filled('email') && $request->filled('password')) {
+
+            $user = User::create([
+                'name' => $request->first_name . ' ' . $request->last_name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+
+                // Set role automatically
+                'user_type' => strtolower($position),
+            ]);
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Format Sex
+        |--------------------------------------------------------------------------
+        */
 
         $sex = $request->input('sex');
+
         if (in_array($sex, ['Male', 'Female'])) {
             $sex = ($sex === 'Male') ? 'M' : 'F';
         }
 
-        $staff = new Staff();
-        $staff->staff_id = $staffId;
-        $staff->first_name = $request->input('first_name');
-        $staff->last_name = $request->input('last_name');
-        $staff->position = $request->input('position');
-        $staff->sex = $sex;
-        $staff->date_of_birth = $request->input('date_of_birth');        $staff->date_joined = $request->input('date_joined');
-        $staff->salary = $request->input('salary');
-        $staff->branch_id = $request->input('branch_id');
-        $staff->phone = $request->input('phone');
+        /*
+        |--------------------------------------------------------------------------
+        | Create Staff
+        |--------------------------------------------------------------------------
+        */
 
-        // Your DB migration for `staff` may not include a `mobile` column.
-        // So only set it when it exists, otherwise let the insert work.
+        $staff = new Staff();
+
+        $staff->staff_id = $staffId;
+
+        // Link created user account
+        $staff->user_id = $user?->id;
+
+        $staff->first_name = $request->first_name;
+        $staff->last_name = $request->last_name;
+        $staff->position = $position;
+
+        $staff->sex = $sex;
+        $staff->date_of_birth = $request->date_of_birth;
+        $staff->date_joined = $request->date_joined;
+        $staff->salary = $request->salary;
+
+        $staff->branch_id = $request->branch_id;
+        $staff->phone = $request->phone;
+
         if (Schema::hasColumn('staff', 'mobile')) {
-            $staff->mobile = $request->input('mobile');
+            $staff->mobile = $request->mobile;
         }
 
+        $staff->nin = $request->nin;
+        $staff->supervisor_id = $request->supervisor_id;
+        $staff->address = $request->address;
 
-        $staff->nin = $request->input('nin');
-        $staff->supervisor_id = $request->input('supervisor_id');
-        $staff->address = $request->input('address');
         $staff->save();
+
+        DB::commit();
 
         return redirect()
             ->route('staff.index')
             ->with('success', 'Staff created successfully.');
+
+    } catch (\Throwable $e) {
+
+        DB::rollBack();
+
+        return back()
+            ->withErrors(['error' => $e->getMessage()])
+            ->withInput();
     }
+}
 
     public function show($id)
     {
