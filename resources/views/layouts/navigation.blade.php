@@ -21,7 +21,7 @@
 
     if ($user?->hasRole('Admin')) {
         $dashboardRoute = 'admin.dashboard';
-    } elseif ($user?->hasRole('Manager')) {
+    } elseif ($user?->hasRole('Manager') || strtolower($userType ?? '') === 'manager') {
         $dashboardRoute = 'manager.dashboard';
     }
 
@@ -49,7 +49,7 @@
             ['label' => 'Branches', 'route' => 'branch.index', 'active' => request()->routeIs('branch.*')],
             ['label' => 'Admin', 'route' => 'admin.dashboard', 'active' => request()->routeIs('admin*')],
         ]);
-    } elseif ($user?->hasRole('Manager')) {
+    } elseif ($user?->hasRole('Manager') || strtolower($userType ?? '') === 'manager') {
         $navItems = array_merge($navItems, [
             ['label' => 'Staff', 'route' => 'manager.staff.index', 'active' => request()->routeIs('manager.staff.*')],
             ['label' => 'Create Staff', 'route' => 'manager.create', 'active' => request()->routeIs('manager.create')],

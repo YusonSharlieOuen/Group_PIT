@@ -6,9 +6,55 @@
         $preferredType = $renter?->preferred_property_type ?: 'Any property';
     @endphp
 
-    <section class="bg-white">
-        <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-            <div class="grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-center">
+        <div class="relative mx-auto flex min-h-[520px] max-w-7xl items-center px-4 py-16 sm:px-6 lg:px-8">
+            <div class="max-w-2xl">
+                <p class="mb-4 text-xs font-semibold uppercase tracking-[0.35em] text-white/75">Dream Home</p>
+                <h1 class="font-serif text-5xl font-semibold leading-none text-white sm:text-6xl lg:text-7xl">
+                    Find a home that fits your next chapter.
+                </h1>
+                <p class="mt-6 max-w-xl text-base leading-7 text-white/85 sm:text-lg">
+                    Browse available rentals, manage property records, and keep staff, branches, leases, and viewings organized in one place.
+                </p>
+                <div class="mt-8 flex flex-wrap gap-3">
+                    <a href="{{ route('home.find') }}" class="inline-flex items-center rounded-md bg-white px-5 py-3 text-sm font-semibold uppercase tracking-wider text-gray-950 shadow-sm transition hover:bg-gray-100">
+                        View Listings
+                    </a>
+                    <a href="{{ route('property.create') }}" class="inline-flex items-center rounded-md border border-white/50 px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white transition hover:bg-white/10">
+                        Manage Properties
+                </a>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="bg-gray-50 py-10">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="-mt-20 grid gap-4 rounded-lg border border-gray-200 bg-white p-4 shadow-lg sm:grid-cols-2 lg:grid-cols-4">
+                <a href="{{ route('home.find') }}" class="rounded-md border border-gray-100 p-4 transition hover:border-gray-300 hover:bg-gray-50">
+                    <p class="text-xs font-semibold uppercase tracking-widest text-gray-500">Search</p>
+                    <p class="mt-2 text-lg font-semibold text-gray-950">Find a Home</p>
+                </a>
+                <a href="{{ route('property.create') }}" class="rounded-md border border-gray-100 p-4 transition hover:border-gray-300 hover:bg-gray-50">
+                    <p class="text-xs font-semibold uppercase tracking-widest text-gray-500">Portfolio</p>
+
+                    <p class="mt-2 text-lg font-semibold text-gray-950">Properties</p>
+                </a>
+
+                @if(!auth()->user() || (!auth()->user()?->hasRole('Renter')))
+                    <a href="{{ route('viewing.create') }}" class="rounded-md border border-gray-100 p-4 transition hover:border-gray-300 hover:bg-gray-50">
+                        <p class="text-xs font-semibold uppercase tracking-widest text-gray-500">Schedule</p>
+                        <p class="mt-2 text-lg font-semibold text-gray-950">Book Viewing</p>
+                    </a>
+                @endif
+
+            </div>
+        </div>
+    </section>
+
+    <section class="bg-gray-50 pb-16">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-widest text-[#5c9aa9]">Client Dashboard</p>
                     <h1 class="mt-3 font-serif text-4xl font-semibold text-gray-950 sm:text-5xl">

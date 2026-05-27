@@ -6,54 +6,171 @@
                      class="h-80 w-full object-cover"
                      alt="Property {{ $property->property_id }}">
 
-                <div class="p-6 sm:p-8">
-                    <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700">
+
+                <div>
+                    <p><strong>Area:</strong> {{ $property->area }}</p>
+                    <p><strong>Postcode:</strong> {{ $property->postcode }}</p>
+                    <p><strong>Type:</strong> {{ $property->property_type }}</p>
+                    <p><strong>Rooms:</strong> {{ $property->number_of_rooms }}</p>
+                </div>
+
+                <div>
+                    <p><strong>Monthly Rent:</strong> ₱{{ number_format($property->monthly_rent) }}</p>
+
+                    <p class="mt-2">
+                        <strong>Status:</strong>
+
+                        <span class="px-3 py-1 rounded-full text-white text-sm
+                            {{ $property->status == 'Available'
+                                ? 'bg-green-500'
+                                : 'bg-red-500' }}">
+
+                            {{ $property->status }}
+
+                        </span>
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+@unless(auth()->user()?->hasRole('Renter'))
+        <div class="mt-10 bg-white border border-gray-200 rounded-2xl shadow-md p-6">
+
+
+
+
+            <h2 class="text-2xl font-bold text-gray-800 mb-1">
+                Book this property
+            </h2>
+
+            <p class="text-sm text-gray-600 mb-6">
+                Pick a renter and select a viewing date.
+            </p>
+
+            <form action="{{ route('viewing.store') }}" method="POST" class="space-y-6">
+
+                @csrf
+
+                <input
+                    type="hidden"
+                    name="property_id"
+                    value="{{ $property->property_id }}"
+                >
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    @if(!auth()->user() || !auth()->user()?->hasRole('Renter'))
+
                         <div>
-                            <p class="text-xs font-semibold uppercase tracking-widest text-[#5c9aa9]">Property Details</p>
-                            <h1 class="mt-2 font-serif text-4xl font-semibold text-gray-950">
-                                {{ $property->street ?? 'Rental Property' }}
-                            </h1>
-                            <p class="mt-2 text-sm text-gray-600">
-                                {{ $property->area }}, {{ $property->city }} {{ $property->postcode }}
-                            </p>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Renter
+                            </label>
+
+                            <select
+                                name="renter_id"
+                                class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-[#5c9aa9] focus:border-[#5c9aa9]"
+                                required
+                            >
+
+                                <option value="">Select Renter</option>
+
+                                @foreach($renters as $renter)
+                                    <option value="{{ $renter->renter_id }}">
+                                        {{ $renter->first_name }}
+                                        {{ $renter->last_name }}
+                                        ({{ $renter->renter_id }})
+                                    </option>
+                                @endforeach
+
+                            </select>
                         </div>
-                        <div class="rounded-md bg-gray-50 px-4 py-3 text-right">
-                            <p class="text-xs font-semibold uppercase tracking-widest text-gray-500">Monthly Rent</p>
-                            <p class="mt-1 text-2xl font-bold text-gray-950">PHP {{ number_format($property->monthly_rent ?? 0) }}</p>
-                        </div>
+                    @else
+                        {{-- Client booking: capture renter_id automatically --}}
+                        <input type="hidden" name="renter_id" value="{{ auth()->user()->renter?->renter_id ?? auth()->user()->id }}">
+                    @endif
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Viewing Date
+                        </label>
+
+                        <input
+                            type="date"
+                            name="viewing_date"
+                            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-[#5c9aa9] focus:border-[#5c9aa9]"
+                            required
+                        >
                     </div>
 
-                    <div class="mt-8 grid gap-6 lg:grid-cols-3">
-                        <div class="rounded-lg border border-gray-200 p-5 lg:col-span-2">
-                            <h2 class="font-serif text-2xl font-semibold text-gray-950">Home Information</h2>
-                            <dl class="mt-5 grid gap-4 sm:grid-cols-2">
-                                <div>
-                                    <dt class="text-xs font-semibold uppercase tracking-widest text-gray-500">Property ID</dt>
-                                    <dd class="mt-1 text-sm font-medium text-gray-950">{{ $property->property_id }}</dd>
-                                </div>
-                                <div>
-                                    <dt class="text-xs font-semibold uppercase tracking-widest text-gray-500">Status</dt>
-                                    <dd class="mt-1">
-                                        <span class="rounded-full px-3 py-1 text-xs font-semibold text-white {{ $property->status === 'Available' ? 'bg-green-600' : 'bg-red-600' }}">
-                                            {{ $property->status }}
-                                        </span>
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt class="text-xs font-semibold uppercase tracking-widest text-gray-500">Property Type</dt>
-                                    <dd class="mt-1 text-sm font-medium text-gray-950">{{ $property->property_type ?? 'N/A' }}</dd>
-                                </div>
-                                <div>
-                                    <dt class="text-xs font-semibold uppercase tracking-widest text-gray-500">Rooms</dt>
-                                    <dd class="mt-1 text-sm font-medium text-gray-950">{{ $property->number_of_rooms ?? 'N/A' }}</dd>
-                                </div>
-                                <div class="sm:col-span-2">
-                                    <dt class="text-xs font-semibold uppercase tracking-widest text-gray-500">Full Address</dt>
-                                    <dd class="mt-1 text-sm font-medium text-gray-950">
-                                        {{ $property->street }}, {{ $property->area }}, {{ $property->city }}, {{ $property->postcode }}
-                                    </dd>
-                                </div>
-                            </dl>
+                </div>
+
+                <div class="mt-6">
+
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Comments
+                    </label>
+
+                    <textarea
+                        name="comments"
+                        rows="4"
+                        class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-[#5c9aa9] focus:border-[#5c9aa9]"
+                        placeholder="Enter comments..."
+                    ></textarea>
+
+                </div>
+
+
+                <div class="mt-6">
+                    <button
+                        type="submit"
+                        class="bg-[#5c9aa9] hover:bg-[#4a8796] text-white font-semibold px-6 py-3 rounded-xl transition"
+                    >
+                        Create Viewing
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+
+        <div class="mt-10">
+
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">
+                Viewings
+            </h2>
+
+            @if($viewings->count() == 0)
+
+                <p class="text-gray-500">No viewings yet.</p>
+
+            @else
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                    @foreach($viewings as $viewing)
+
+                        <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 hover:shadow-md transition">
+
+                            <p class="font-semibold text-gray-800">
+                                {{ $viewing->renter->first_name }}
+                                {{ $viewing->renter->last_name }}
+
+                                <span class="text-gray-500 font-normal">
+                                    ({{ $viewing->renter_id }})
+                                </span>
+                            </p>
+
+                            <p class="text-sm text-gray-600 mt-2">
+                                <strong>Date:</strong> {{ $viewing->viewing_date }}
+                            </p>
+
+                            <p class="text-sm text-gray-600 mt-1">
+                                <strong>Comments:</strong> {{ $viewing->comments }}
+                            </p>
+
                         </div>
 
                         <div class="rounded-lg border border-gray-200 p-5">
@@ -73,7 +190,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    @endforeach
 
                     <div class="mt-6 rounded-lg border border-gray-200 p-5">
                         <h2 class="font-serif text-2xl font-semibold text-gray-950">Advertisement Details</h2>
@@ -100,6 +217,7 @@
                         </a>
                     </div>
                 </div>
+            @endif
             </div>
 
             <div class="mt-8 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
@@ -133,4 +251,8 @@
             </div>
         </div>
     </div>
+
+</div>
+
+@endunless
 </x-app-layout>

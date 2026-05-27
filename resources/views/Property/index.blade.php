@@ -13,8 +13,9 @@
 
             <div class="flex gap-3 mt-4 md:mt-0">
 
-                <a href="{{ route('property.index') }}">
+                <a href="{{ route('property.create') }}">
                     <button class="px-4 py-2 bg-gray-200 rounded-lg text-sm font-semibold hover:bg-gray-300 transition">
+
                         All Properties
                     </button>
                 </a>

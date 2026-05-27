@@ -17,38 +17,34 @@ class RoleMiddleware
      * @param  string|null  $roles
      */
     public function handle(Request $request, Closure $next, ?string $roles = null)
-{
-    $user = $request->user();
+    {
+        $user = $request->user();
 
-    if (! $user) {
-        abort(Response::HTTP_FORBIDDEN);
-    }
+        if (! $user) {
+            abort(Response::HTTP_FORBIDDEN);
+        }
 
-    $allowed = [];
+        $allowed = [];
+        if ($roles) {
+            $allowed = array_map('trim', explode(',', $roles));
+            $allowed = array_map('strtolower', $allowed);
+        }
 
-    if ($roles) {
-        $allowed = array_map('trim', explode(',', $roles));
-        $allowed = array_map('strtolower', $allowed);
-    }
+        $position = null;
 
-    // CHECK user_type FIRST
-    $userType = strtolower($user->user_type ?? '');
+        // Primary source: staff relation (preferred)
+        if (method_exists($user, 'staff') && $user->staff) {
+            $position = strtolower($user->staff->position);
 
-    if (in_array($userType, $allowed, true)) {
+        // Fallback: users.user_type (some accounts store role here)
+        } elseif (property_exists($user, 'user_type') && ! empty($user->user_type)) {
+            $position = strtolower((string) $user->user_type);
+        }
+
+        if (empty($allowed) || ! $position || ! in_array($position, $allowed, true)) {
+            abort(Response::HTTP_FORBIDDEN, 'Unauthorized.');
+        }
+
         return $next($request);
     }
-
-    // OPTIONAL fallback to staff position
-    $position = null;
-
-    if (method_exists($user, 'staff') && $user->staff) {
-        $position = strtolower($user->staff->position);
-    }
-
-    if ($position && in_array($position, $allowed, true)) {
-        return $next($request);
-    }
-
-    abort(Response::HTTP_FORBIDDEN, 'Unauthorized.');
-}
 }

@@ -1,4 +1,22 @@
 <x-app-layout>
+<<<<<<< HEAD
+
+@unless(auth()->user()?->hasRole('Admin') || auth()->user()?->hasRole('Manager'))
+
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800 font-semibold">
+            Unauthorized.
+        </div>
+    </div>
+    @php abort(403); @endphp
+@endunless
+
+    <div class="bg-white min-h-screen pb-16">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <div class="bg-white border border-gray-200 rounded-2xl shadow-md p-6">
+                <h1 class="text-3xl font-bold text-gray-900">Book a viewing</h1>
+                <p class="mt-2 text-sm text-gray-600">Fill the form below to create a booking.</p>
+=======
     <div class="bg-gray-50 min-h-screen py-10">
         <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
             <div class="mb-6">
@@ -6,6 +24,7 @@
                 <h1 class="mt-2 font-serif text-4xl font-semibold text-gray-950">Book a Viewing</h1>
                 <p class="mt-2 text-sm text-gray-600">Choose an available property, select a viewing date, and add any notes for the branch team.</p>
             </div>
+>>>>>>> 4d8fd99ccfa23617e6d133e307f9932fcfbcb2b4
 
             <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                 @if(session('success'))

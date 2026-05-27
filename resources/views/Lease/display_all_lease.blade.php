@@ -1,8 +1,22 @@
 <x-app-layout>
 
+@php
+    $user = auth()->user();
+    $userType = strtolower($user?->user_type ?? '');
+    $canManageLeases = ($user && ($user->hasRole(['Admin', 'Manager']) || in_array($userType, ['admin', 'manager'], true)));
+@endphp
+
 <div class="max-w-7xl mx-auto px-6 py-10">
 
-    <h2 class="text-2xl font-bold mb-6">All Leases</h2>
+    <div class="flex items-center justify-between gap-4 mb-6">
+        <h2 class="text-2xl font-bold">All Leases</h2>
+
+        @if($canManageLeases)
+            <a href="{{ route('lease.create') }}" class="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                Add New Lease
+            </a>
+        @endif
+    </div>
 
     <div class="overflow-x-auto bg-white shadow rounded-lg border">
 
@@ -20,6 +34,7 @@
                     <th class="p-3 border">Start</th>
                     <th class="p-3 border">End</th>
                     <th class="p-3 border">Duration (mo)</th>
+                    <th class="p-3 border">Actions</th>
                 </tr>
             </thead>
 
@@ -73,10 +88,30 @@
                             {{ $lease->duration }}
                         </td>
 
+                        <td class="p-3 border">
+                            @if($canManageLeases)
+                                <div class="flex items-center gap-2">
+                                    <a href="{{ route('leases.edit', $lease->lease_id) }}" class="inline-flex items-center rounded-md bg-yellow-500 px-2.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-300">
+                                        Edit
+                                    </a>
+
+                                    <form action="{{ route('leases.destroy', $lease->lease_id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this lease?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="inline-flex items-center rounded-md bg-red-600 px-2.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            @else
+                                <span class="text-sm text-gray-500">View only</span>
+                            @endif
+                        </td>
+
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="10" class="p-4 text-center text-gray-500">
+                        <td colspan="11" class="p-4 text-center text-gray-500">
                             No leases found.
                         </td>
                     </tr>

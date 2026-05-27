@@ -63,7 +63,7 @@
 
                 </div>
 
-                <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                     <a
                         href="{{ route('property.create') }}"
                         class="group block rounded-lg border border-green-100 bg-green-50 p-4 transition hover:bg-green-100"
@@ -88,6 +88,24 @@
                         <p class="text-sm font-semibold text-gray-900">Branches</p>
                         <p class="mt-1 text-xs text-gray-600">Manage branch locations used by properties.</p>
                     </a>
+
+                    <a
+                        href="{{ route('lease.all') }}"
+                        class="group block rounded-lg border border-blue-100 bg-blue-50 p-4 transition hover:bg-blue-100"
+                    >
+                        <div class="flex items-start justify-between gap-3">
+
+                            <div>
+                                <p class="text-sm font-semibold text-blue-900">Leases</p>
+                                <p class="mt-1 text-xs text-blue-800">Add, edit, and manage lease transactions.</p>
+                            </div>
+                            <span class="inline-flex items-center rounded-full bg-blue-600 px-3 py-1 text-xs font-bold text-white group-hover:bg-blue-700">
+                                Manage
+                            </span>
+                        </div>
+                    </a>
+
+
                 </div>
             </div>
 

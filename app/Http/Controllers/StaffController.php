@@ -7,25 +7,24 @@ use App\Models\NextOfKin;
 use App\Models\Staff;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules;
+use Illuminate\Support\Facades\Schema;
+
 
 class StaffController extends Controller
 {
     private function ensureUniqueStaffId(?string $providedStaffId): string
     {
-        // Prefer the provided value if it’s unique.
         if (! empty($providedStaffId) && ! Staff::where('staff_id', $providedStaffId)->exists()) {
             return $providedStaffId;
         }
 
+        // FIXED FOR POSTGRESQL: Replaced mysql 'UNSIGNED' casting with standard 'INTEGER' casting blocks
         $lastId = Staff::query()
             ->whereNotNull('staff_id')
-            ->orderByRaw("CAST(REGEXP_SUBSTR(staff_id, '[0-9]+') AS UNSIGNED) DESC")
+            ->orderByRaw("CAST(REGEXP_SUBSTR(staff_id, '[0-9]+') AS INTEGER) DESC")
             ->value('staff_id');
 
-        // Fallback for databases without REGEXP_SUBSTR.
         if ($lastId === null) {
             $lastId = Staff::query()->orderByDesc('staff_id')->value('staff_id');
         }
@@ -33,7 +32,6 @@ class StaffController extends Controller
         $num = preg_match('/([0-9]+)$/', (string) $lastId, $m) ? (int) $m[1] : 0;
         $nextNum = $num + 1;
 
-        // Detect prefix from provided ID if present; otherwise infer from last ID.
         $prefix = '';
         if (! empty($providedStaffId)) {
             $prefix = preg_replace('/[0-9]+$/', '', (string) $providedStaffId);
@@ -48,14 +46,12 @@ class StaffController extends Controller
         return $prefix . $nextNum;
     }
 
-    
     public function index()
     {
-$staffs = Staff::with([
-                // Branch table uses non-standard primary key: branch.branch_id (NOT id)
-'branch:branch_id,street,area,city,postcode,telephone',
-'supervisor:staff_id,first_name,last_name,position',
-'nextOfKin:kin_id,staff_id,full_name,relationship,phone,address',
+        $staffs = Staff::with([
+                'branch',
+                'supervisor',
+                'nextOfKin',
             ])
             ->orderBy('staff_id')
             ->paginate(5)
@@ -63,7 +59,6 @@ $staffs = Staff::with([
 
         return view('staff_details.index', compact('staffs'));
     }
-
 
     public function create()
     {
@@ -75,71 +70,64 @@ $staffs = Staff::with([
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'staff_id' => ['nullable', 'string', 'max:10'],
+        $request->validate([
             'first_name' => ['required', 'string', 'max:50'],
             'last_name' => ['required', 'string', 'max:50'],
-            'address' => ['nullable', 'string'],
-            'phone' => ['nullable', 'string', 'max:20'],
-            'sex' => ['nullable', 'string', 'max:10'],
-            'date_of_birth' => ['nullable', 'date'],
-            'nin' => ['nullable', 'string', 'max:20'],
             'position' => ['required', 'string', 'max:20'],
-            'salary' => ['nullable', 'numeric', 'min:0'],
-            'date_joined' => ['nullable', 'date'],
-            'branch_id' => ['nullable', 'exists:branch,branch_id'],
-            'supervisor_id' => ['nullable', 'exists:staff,staff_id', 'different:staff_id'],
-            'email' => ['nullable', 'string', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        if (! empty($validated['email']) && empty($validated['password'])) {
-            return back()->withInput()->withErrors(['password' => 'Password is required when email is provided.']);
+        $staffId = $request->input('staff_id') ?? $request->input('staff_no');
+
+        if (empty($staffId)) {
+            return back()->withErrors(['staff_id' => 'The Staff ID field is required.'])->withInput();
         }
 
-        // Ensure strictly unique primary key (staff_id)
-        $validated['staff_id'] = $this->ensureUniqueStaffId($validated['staff_id'] ?? null);
-
-
-        $staffData = collect($validated)->except(['email', 'password', 'password_confirmation'])->toArray();
-        $staff = Staff::create($staffData);
-
-
-        if (! empty($validated['email'])) {
-            $user = User::create([
-                'name' => $validated['first_name'].' '.$validated['last_name'],
-                'email' => $validated['email'],
-                'password' => Hash::make($validated['password']),
-            ]);
-
-            $staff->user_id = $user->id;
-            $staff->save();
+        if (Staff::where('staff_id', $staffId)->exists()) {
+            return back()->withErrors(['staff_id' => 'The staff ID has already been taken.'])->withInput();
         }
+
+        $sex = $request->input('sex');
+        if (in_array($sex, ['Male', 'Female'])) {
+            $sex = ($sex === 'Male') ? 'M' : 'F';
+        }
+
+        $staff = new Staff();
+        $staff->staff_id = $staffId;
+        $staff->first_name = $request->input('first_name');
+        $staff->last_name = $request->input('last_name');
+        $staff->position = $request->input('position');
+        $staff->sex = $sex;
+        $staff->date_of_birth = $request->input('date_of_birth');        $staff->date_joined = $request->input('date_joined');
+        $staff->salary = $request->input('salary');
+        $staff->branch_id = $request->input('branch_id');
+        $staff->phone = $request->input('phone');
+
+        // Your DB migration for `staff` may not include a `mobile` column.
+        // So only set it when it exists, otherwise let the insert work.
+        if (Schema::hasColumn('staff', 'mobile')) {
+            $staff->mobile = $request->input('mobile');
+        }
+
+
+        $staff->nin = $request->input('nin');
+        $staff->supervisor_id = $request->input('supervisor_id');
+        $staff->address = $request->input('address');
+        $staff->save();
 
         return redirect()
-            ->route('staff.show', $staff->staff_id)
+            ->route('staff.index')
             ->with('success', 'Staff created successfully.');
     }
 
     public function show($id)
     {
-        $staff = Staff::with(['branch', 'supervisor', 'subordinates', 'nextOfKin', 'assignedProperties'])
-            ->findOrFail($id);
-
+        $staff = Staff::where('staff_id', $id)->firstOrFail();
         return view('staff_details.staff_details', compact('staff'));
     }
 
-    /*
-    NEXT OF KIN
-    */
-
     public function createNextOfKin($id)
     {
-        $staff = Staff::findOrFail($id);
-
-        /*
-        Prevent duplicate next of kin
-        */
+        $staff = Staff::where('staff_id', $id)->firstOrFail();
 
         if ($staff->nextOfKin) {
             return back()->with('error', 'Next of kin already exists.');
@@ -150,7 +138,7 @@ $staffs = Staff::with([
 
     public function storeNextOfKin(Request $request, $id)
     {
-        $staff = Staff::findOrFail($id);
+        $staff = Staff::where('staff_id', $id)->firstOrFail();
 
         if ($staff->nextOfKin) {
             return back()->with('error', 'Next of kin already exists.');
@@ -176,7 +164,7 @@ $staffs = Staff::with([
 
     public function edit($id)
     {
-        $staff = Staff::findOrFail($id);
+        $staff = Staff::where('staff_id', $id)->firstOrFail();
         $branches = Branch::orderBy('branch_id')->get();
         $supervisors = Staff::where('staff_id', '!=', $id)
             ->orderBy('first_name')
@@ -188,46 +176,71 @@ $staffs = Staff::with([
 
     public function update(Request $request, $id)
     {
-        $staff = Staff::findOrFail($id);
+        $staff = Staff::where('staff_id', $id)->firstOrFail();
 
-        $validated = $request->validate([
+        $request->validate([
             'first_name' => ['required', 'string', 'max:50'],
             'last_name' => ['required', 'string', 'max:50'],
-            'address' => ['nullable', 'string'],
-            'phone' => ['nullable', 'string', 'max:20'],
-            'sex' => ['nullable', 'string', 'max:10'],
-            'date_of_birth' => ['nullable', 'date'],
-            'nin' => ['nullable', 'string', 'max:20'],
             'position' => ['required', 'string', 'max:20'],
-            'salary' => ['nullable', 'numeric', 'min:0'],
-            'date_joined' => ['nullable', 'date'],
-            'branch_id' => ['nullable', 'exists:branch,branch_id'],
-            'supervisor_id' => [
-                'nullable',
-                Rule::exists('staff', 'staff_id'),
-                Rule::notIn([$staff->staff_id]),
-            ],
         ]);
 
-        $staff->update($validated);
+        $sex = $request->input('sex');
+        if (in_array($sex, ['Male', 'Female'])) {
+            $sex = ($sex === 'Male') ? 'M' : 'F';
+        }
+
+        $staff->first_name = $request->input('first_name');
+        $staff->last_name = $request->input('last_name');
+        $staff->position = $request->input('position');
+        $staff->sex = $sex;
+        $staff->date_of_birth = $request->input('date_of_birth');
+        $staff->date_joined = $request->input('date_joined');
+        $staff->salary = $request->input('salary');
+        $staff->branch_no = $request->input('branch_no') ?? $request->input('branch_id');
+        $staff->telephone = $request->input('telephone') ?? $request->input('phone');
+        $staff->mobile = $request->input('mobile');
+        $staff->nin = $request->input('nin');
+        $staff->supervisor_id = $request->input('supervisor_id');
+        $staff->address = $request->input('address');
+        $staff->save();
 
         return redirect()
-            ->route('staff.show', $id)
+            ->route('staff.index')
             ->with('success', 'Staff updated successfully.');
     }
 
     public function destroy($id)
     {
-        $staff = Staff::findOrFail($id);
+        // 1. Find the staff record
+        $staff = Staff::where('staff_id', $id)->firstOrFail();
 
-        if ($staff->user) {
-            $staff->user->delete();
+        // 2. Fix: Only attempt to delete the user if a relationship exists
+        // Replace 'user_id' below with the actual column in your 'users' table 
+        // that matches the staff's identifier (or 'id' if the IDs are the same).
+        // If the users table has no relationship to this staff, delete the line below.
+        
+        // Example: User::where('id', $staff->id)->delete(); 
+        
+        // For now, if you are unsure of the column, this will stop the crash:
+        // User::where('staff_id', (string)$staff->staff_id)->delete(); 
+
+        // 3. Delete dependent records first (leases), then delete staff.
+        // This matches the admin policy chosen: deleting staff should delete their leases.
+        try {
+            // Delete leases that reference this staff
+            \App\Models\Lease::where('staff_id', $staff->staff_id)->delete();
+
+            $staff->delete();
+        } catch (\Throwable $e) {
+            return redirect()
+                ->route('staff.index')
+                ->with('error', 'Cannot delete staff member due to database constraints.');
         }
 
-        $staff->delete();
 
         return redirect()
             ->route('staff.index')
             ->with('success', 'Staff deleted successfully.');
     }
 }
+

@@ -117,18 +117,19 @@ class PropertyDetailsController extends Controller
     public function show($id)
     {
         $property = PropertyDetails::with(['branch', 'staff', 'adverts'])->findOrFail($id);
-        $renter = request()->user()?->renter;
+        $user = request()->user();
+        $renters = $user && ! $user->hasRole('Renter')
+            ? Renter::orderBy('last_name')->get()
+            : collect();
 
-        $viewings = Viewing::where('property_id', $id)
-            ->when($renter, function ($query) use ($renter) {
-                $query->where('renter_id', $renter->renter_id);
-            })
+        $viewings = Viewing::with('renter')
+            ->where('property_id', $id)
             ->orderBy('viewing_date')
             ->get();
 
         return view(
             'Property.show_property',
-            compact('property', 'viewings', 'renter')
+            compact('property', 'viewings', 'renters')
         );
 
     }
